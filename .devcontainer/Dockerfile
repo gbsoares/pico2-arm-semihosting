@@ -17,6 +17,7 @@ RUN set -x \
 RUN set -x \
     && apt-get install --no-install-recommends -y \
         git \
+        openssh-client \
         ca-certificates \
         python3 \
         tar \
