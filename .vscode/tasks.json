@@ -1,0 +1,100 @@
+{
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "picoPlatform",
+            "description": "Select the PICO_PLATFORM",
+            "default": "rp2350",
+            "type": "pickString",
+            "options": [
+                {
+                    "label": "RP2350 (Pico 2)",
+                    "value": "rp2350"
+                },
+                {
+                    "label": "RP2040 (Pico 1)",
+                    "value": "rp2040"
+                }
+            ]
+        },
+        {
+            "id": "picoBoard",
+            "description": "Select the PICO_BOARD",
+            "default": "pico2_w",
+            "type": "pickString",
+            "options": [
+                {
+                    "label": "Pico 2 W",
+                    "value": "pico2_w"
+                },
+                {
+                    "label": "Pico 2",
+                    "value": "pico2"
+                },
+                {
+                    "label": "Pico W",
+                    "value": "pico_w"
+                },
+                {
+                    "label": "Pico",
+                    "value": "pico"
+                }
+            ]
+        }
+    ],
+    "tasks": [
+        {
+            "label": "CMake Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S",
+                ".",
+                "-B",
+                "build",
+                "-DPICO_PLATFORM=${input:picoPlatform}",
+                "-DPICO_BOARD=${input:picoBoard}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "CMake Build hello_world",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build",
+                "--target",
+                "hello_world"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Full Build (Configure + Build)",
+            "dependsOn": [
+                "CMake Configure",
+                "CMake Build hello_world"
+            ],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        }
+    ]
+}

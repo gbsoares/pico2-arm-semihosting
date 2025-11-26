@@ -1,0 +1,15 @@
+[
+    {
+        "name": "Pico",
+        "compilers": {
+            "C": "/usr/bin/arm-none-eabi-gcc",
+            "CXX": "/usr/bin/arm-none-eabi-g++"
+        },
+        "environmentVariables": {
+            "PATH": "${env:PATH}"
+        },
+        "cmakeSettings": {
+            "Python3_EXECUTABLE": "/usr/bin/python3"
+        }
+    }
+]

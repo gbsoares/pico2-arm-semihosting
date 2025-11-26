@@ -1,0 +1,32 @@
+{
+    "name": "Pico-SDK Dev Container",
+    "build":{
+        "dockerfile": "Dockerfile"
+    },
+    "features": {},
+    "runArgs": [
+        // Enable USB access for debugging tools like openocd
+        "--device=/dev/bus/usb:/dev/bus/usb"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cpptools-themes",
+                "mcu-debug.debug-tracker-vscode",
+                "marus25.cortex-debug"
+            ],
+            "settings": {
+                "editor.bracketPairColorization.enabled": true,
+                "C_Cpp.default.includePath": [
+                    "${workspaceFolder}/**",
+                    "${env.PICO_SDK_PATH}/**"
+                ]
+            }
+        }
+    }
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "root"
+}
