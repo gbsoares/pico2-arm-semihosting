@@ -15,5 +15,11 @@ endif()
 # Initialize the SDK
 pico_sdk_init()
 
+# Add compiler flags
+add_compile_options(
+    -Wall
+    -Werror
+)
+
 # Targets to include
 add_subdirectory(hello_world)
