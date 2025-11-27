@@ -15,8 +15,6 @@ This project includes a VS Code dev container configuration for easy setup:
 
 ## Requirements
 
-- Raspberry Pi Pico SDK 2.2.0 or later
-- CMake 3.12 or later
 - ARM debugger supporting semihosting (e.g., OpenOCD with GDB)
   - I like to use another Pico device set up as a [debugprobe](https://github.com/raspberrypi/debugprobe)
 
