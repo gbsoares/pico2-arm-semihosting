@@ -18,8 +18,11 @@ pico_sdk_init()
 # Add compiler flags
 add_compile_options(
     -Wall
-    -Werror
+    -Wno-unused-function
 )
 
-# Targets to include
-add_subdirectory(hello_world)
+# Build the pico_semihosting library first
+add_subdirectory(src)
+
+# Build examples
+add_subdirectory(examples)

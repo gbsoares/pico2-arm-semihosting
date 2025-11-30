@@ -1,6 +1,26 @@
 # ARM Semihosting on the RPi Pico 2
 
-Project exploring ARM semihosting on the Raspberry Pi Pico microcontrollers.
+A library and examples for ARM semihosting on the Raspberry Pi Pico microcontrollers, providing heap tracking and semihosting utilities.
+
+## Library Structure
+
+This project is organized as a proper library with examples:
+
+- **`src/`** - The pico_semihosting library source code
+- **`include/`** - Public API headers for the library
+- **`examples/`** - Example programs demonstrating library usage
+
+### Library Components
+
+- **Semihosting Utilities** - Low-level semihosting system calls for file I/O
+- **Heap Tracker** - Memory allocation tracking with binary trace output
+
+## Examples
+
+- **`hello_world`** - Basic ARM semihosting "Hello World" example
+- **`malloc_wrapper`** - Memory allocation wrapper that logs malloc/free/realloc calls via semihosting
+- **`malloc_double_wrapper`** - Double-wrapped memory allocator that wraps Pico SDK's malloc wrappers
+- **`heap_tracker`** - Advanced heap tracking with binary trace file output
 
 ## Development Container
 
@@ -25,7 +45,13 @@ Use the command pallete (`CTRL+SHIFT+P`) to access build commands under `Tasks: 
 ```bash
 # Configure the build
 cmake -S . -B build -DPICO_PLATFORM=rp2350 -DPICO_BOARD=pico2
-# Build the project
+
+# Build a specific target
 cmake --build build --target hello_world
+cmake --build build --target malloc_wrapper
+cmake --build build --target malloc_double_wrapper
+
+# Or build all targets
+cmake --build build
 ```
 
