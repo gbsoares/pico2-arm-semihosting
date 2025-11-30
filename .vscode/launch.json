@@ -1,10 +1,28 @@
 {
     "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "target",
+            "description": "Select the target to debug",
+            "default": "heap_tracker",
+            "type": "pickString",
+            "options": [
+                {
+                    "label": "hello_world",
+                    "value": "hello_world"
+                },
+                {
+                    "label": "heap_tracker",
+                    "value": "heap_tracker"
+                }
+            ]
+        }
+    ],
     "configurations": [
         {
             "name": "Pico Debug (Cortex-Debug)",
             "cwd": "${env:PICO_SDK_TOOLS_PATH}/openocd/scripts",
-            "executable": "${workspaceFolder}/build/hello_world/hello_world.elf",
+            "executable": "${workspaceFolder}/build/examples/${input:target}/${input:target}.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
@@ -21,7 +39,7 @@
             // Also works fine for flash binaries
             "overrideLaunchCommands": [
                 "monitor reset init",
-                "load \"${workspaceFolder}/build/hello_world/hello_world.elf\""
+                "load \"${workspaceFolder}/build/examples/${input:target}/${input:target}.elf\""
             ],
             "openOCDLaunchCommands": [
                 "adapter speed 5000"

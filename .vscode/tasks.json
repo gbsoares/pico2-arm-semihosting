@@ -40,6 +40,38 @@
                     "value": "pico"
                 }
             ]
+        },
+        {
+            "id": "buildTarget",
+            "description": "Select the build target",
+            "default": "all",
+            "type": "pickString",
+            "options": [
+                {
+                    "label": "All Targets",
+                    "value": "all"
+                },
+                {
+                    "label": "Hello World",
+                    "value": "hello_world"
+                },
+                {
+                    "label": "Malloc Wrapper",
+                    "value": "malloc_wrapper"
+                },
+                {
+                    "label": "Malloc Double Wrapper",
+                    "value": "malloc_double_wrapper"
+                },
+                {
+                    "label": "Heap Tracker",
+                    "value": "heap_tracker"
+                },
+                {
+                    "label": "Pico Semihosting Library",
+                    "value": "pico_semihosting"
+                }
+            ]
         }
     ],
     "tasks": [
@@ -65,14 +97,14 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "CMake Build hello_world",
+            "label": "CMake Build Target",
             "type": "shell",
             "command": "cmake",
             "args": [
                 "--build",
                 "build",
                 "--target",
-                "hello_world"
+                "${input:buildTarget}"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -84,12 +116,59 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Full Build (Configure + Build)",
+            "label": "Full Build (Configure + Build Target)",
             "dependsOn": [
                 "CMake Configure",
-                "CMake Build hello_world"
+                "CMake Build Target"
             ],
             "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "CMake Clean",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build",
+                "--target",
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean All (Remove Build Directory)",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build All Targets",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
