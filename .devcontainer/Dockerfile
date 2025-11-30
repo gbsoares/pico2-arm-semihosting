@@ -19,20 +19,22 @@ RUN set -x \
         git \
         openssh-client \
         ca-certificates \
-        python3 \
         tar \
+        jq \
+        curl \
+        wget \
+        usbutils
+
+RUN set -x \
+    && apt-get install --no-install-recommends -y \
+        python3 \
+        clang-format \
         build-essential \
         cmake \
         gcc-arm-none-eabi \
         gdb-multiarch \
         libnewlib-arm-none-eabi \
         libstdc++-arm-none-eabi-newlib
-
-RUN set -x \
-    && apt-get install --no-install-recommends -y \
-        curl \
-        jq \
-        wget 
 
 # -------- Pico-SDK --------
 RUN set -x \

@@ -1,0 +1,10 @@
+# Google C/C++ Code Style settings
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
+Language: Cpp
+BasedOnStyle: Google
+AccessModifierOffset: -1
+BreakBeforeBraces: Linux
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
