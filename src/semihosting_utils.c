@@ -1,4 +1,5 @@
 #include "pico_semihosting/semihosting_utils.h"
+
 #include <string.h>
 
 /**
