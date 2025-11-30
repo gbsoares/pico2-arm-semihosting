@@ -9,7 +9,7 @@
             "options": [
                 {
                     "label": "hello_world",
-                    "value": "hello_world"
+                    "value": "semihosting/hello_world/hello_world"
                 }
             ]
         }
@@ -18,7 +18,7 @@
         {
             "name": "Pico Debug (Cortex-Debug)",
             "cwd": "${env:PICO_SDK_TOOLS_PATH}/openocd/scripts",
-            "executable": "${workspaceFolder}/build/examples/${input:target}/${input:target}.elf",
+            "executable": "${workspaceFolder}/build/examples/${input:target}.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
@@ -35,7 +35,7 @@
             // Also works fine for flash binaries
             "overrideLaunchCommands": [
                 "monitor reset init",
-                "load \"${workspaceFolder}/build/examples/${input:target}/${input:target}.elf\""
+                "load \"${workspaceFolder}/build/examples/${input:target}.elf\""
             ],
             "openOCDLaunchCommands": [
                 "adapter speed 5000"
