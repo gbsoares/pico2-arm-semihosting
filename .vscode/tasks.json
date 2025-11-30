@@ -56,20 +56,8 @@
                     "value": "hello_world"
                 },
                 {
-                    "label": "Malloc Wrapper",
-                    "value": "malloc_wrapper"
-                },
-                {
-                    "label": "Malloc Double Wrapper",
-                    "value": "malloc_double_wrapper"
-                },
-                {
-                    "label": "Heap Tracker",
-                    "value": "heap_tracker"
-                },
-                {
-                    "label": "Pico Semihosting Library",
-                    "value": "pico_semihosting"
+                    "label": "Semihosting Library",
+                    "value": "semihosting"
                 }
             ]
         }
@@ -161,6 +149,7 @@
         {
             "label": "Build All Targets",
             "type": "shell",
+            "dependsOn": "CMake Configure",
             "command": "cmake",
             "args": [
                 "--build",

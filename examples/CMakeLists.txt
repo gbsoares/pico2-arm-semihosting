@@ -3,6 +3,3 @@ cmake_minimum_required(VERSION 3.12)
 
 # Add all example subdirectories
 add_subdirectory(hello_world)
-add_subdirectory(malloc_wrapper) 
-add_subdirectory(malloc_double_wrapper)
-add_subdirectory(heap_tracker)

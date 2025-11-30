@@ -10,10 +10,6 @@
                 {
                     "label": "hello_world",
                     "value": "hello_world"
-                },
-                {
-                    "label": "heap_tracker",
-                    "value": "heap_tracker"
                 }
             ]
         }

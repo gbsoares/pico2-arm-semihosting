@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "pico_semihosting/semihosting_utils.h"
+#include "semihosting/semihosting.h"
 
 void semihost_printf(const char* format, ...)
 {
