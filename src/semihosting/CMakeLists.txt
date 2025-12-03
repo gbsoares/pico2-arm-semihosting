@@ -18,6 +18,7 @@ target_include_directories(semihosting
 target_link_libraries(semihosting
     PUBLIC
         pico_stdlib
+        hardware_exception
 )
 
 # Add compiler warnings for library development

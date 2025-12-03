@@ -3,6 +3,6 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "xaver.clang-format",
     "files.associations": {
-        "semihosting_utils.h": "c"
+        "semihosting.h": "c"
     }
 }

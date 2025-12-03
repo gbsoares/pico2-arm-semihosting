@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include "pico/time.h"
-#include "pico_semihosting/semihosting_utils.h"
+#include "semihosting/semihosting.h"
 
 // Forward declarations for the original malloc functions from newlib
 void* _malloc_r(struct _reent* r, size_t size);

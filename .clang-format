@@ -8,3 +8,7 @@ BreakBeforeBraces: Linux
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
+ColumnLimit: 0
+AlignConsecutiveMacros: Consecutive
+SortIncludes: false
+IncludeBlocks: Preserve

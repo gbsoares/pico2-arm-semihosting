@@ -48,6 +48,29 @@
                 "monitor arm semihosting enable",
                 "monitor arm semihosting_fileio enable"
             ]
+        },
+        {
+            "name": "Pico Attach (Cortex-Debug)",
+            "cwd": "${env:PICO_SDK_TOOLS_PATH}/openocd/scripts",
+            "executable": "${workspaceFolder}/build/examples/${input:target}.elf",
+            "request": "attach",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "serverpath": "${env:PICO_SDK_TOOLS_PATH}/openocd/openocd",
+            "gdbPath": "/usr/bin/gdb-multiarch",
+            "device": "RP2350",
+            "configFiles": [
+                "interface/cmsis-dap.cfg",
+                "target/rp2350.cfg"
+            ],
+            "svdFile": "${env:PICO_SDK_PATH}/src/rp2350/hardware_regs/RP2350.svd",
+            "openOCDLaunchCommands": [
+                "adapter speed 5000"
+            ],
+            "postAttachCommands": [
+                "monitor arm semihosting enable",
+                "monitor arm semihosting_fileio enable"
+            ]
         }
     ]
 }

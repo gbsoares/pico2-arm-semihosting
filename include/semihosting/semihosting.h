@@ -2,42 +2,47 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @file semihosting_utils.h
+ * @file semihosting.h
  * @brief Raw semihosting utility functions for Pico
  *
  * This header provides low-level semihosting system call access for
  * file operations and other host interactions.
  */
 
-// Raw semihosting system call numbers
-#define SYS_OPEN 0x01
-#define SYS_CLOSE 0x02
-#define SYS_WRITE 0x05
-#define SYS_READ 0x06
+/* File open modes */
+#define OPEN_MODE_R      0 /*!< Read */
+#define OPEN_MODE_RB     1 /*!< Read binary */
+#define OPEN_MODE_R_PLUS 2 /*!< Read/write */
+#define OPEN_MODE_W      4 /*!< Write */
+#define OPEN_MODE_WB     5 /*!< Write binary */
+#define OPEN_MODE_A      8 /*!< Append */
+#define OPEN_MODE_AB     9 /*!< Append binary */
 
-// File open modes
-#define OPEN_MODE_R 0       ///< Read
-#define OPEN_MODE_RB 1      ///< Read binary
-#define OPEN_MODE_R_PLUS 2  ///< Read/write
-#define OPEN_MODE_W 4       ///< Write
-#define OPEN_MODE_WB 6      ///< Write binary
-#define OPEN_MODE_A 8       ///< Append
-#define OPEN_MODE_AB 10     ///< Append binary
+/* Semihosting error codes */
+#define SEMIHOSTING_ERROR_NO_DEBUGGER -2
+#define SEMIHOSTING_ERROR_FAULT       -3
 
 /**
- * @brief Execute a raw semihosting system call
+ * @brief Initialize semihosting with fault protection
  *
- * @param syscall System call number (SYS_* constants)
- * @param args Pointer to arguments structure
- * @return System call result (varies by call)
+ * This must be called before using any semihosting functions.
+ * It sets up the HardFault handler to catch semihosting faults.
  */
-int semihosting_call(int reason, void* arg);
+void semihosting_init(void);
+
+/**
+ * @brief Check if semihosting is available (debugger attached)
+ *
+ * @return true if semihosting is available, false otherwise
+ */
+bool semihosting_is_available(void);
 
 /**
  * @brief Open a file via semihosting
@@ -75,6 +80,15 @@ int semihosting_write(int handle, const void* data, size_t length);
  * @return Number of bytes read, or negative on error
  */
 int semihosting_read(int handle, void* buffer, size_t length);
+
+/**
+ * @brief Get current time via semihosting
+ *
+ * Returns the number of seconds since January 1, 1970 (Unix epoch time).
+ *
+ * @return Time in seconds since Unix epoch, or -1 on error
+ */
+int semihosting_getTime(void);
 
 #ifdef __cplusplus
 }
