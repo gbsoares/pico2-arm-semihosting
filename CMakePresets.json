@@ -1,0 +1,66 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "_root-config",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "_pico-root-config",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build",
+            "inherits": [
+                "_root-config"
+            ],
+            "cacheVariables": {
+                "SEMIHOSTING_PLATFORM": "PICO"
+            }
+        },
+        {
+            "name": "pico",
+            "displayName": "Raspberry Pi Pico",
+            "description": "Configure for Raspberry Pi Pico platform (RP2040)",
+            "inherits": [
+                "_pico-root-config"
+            ],
+            "cacheVariables": {
+                "PICO_PLATFORM": "rp2040",
+                "PICO_BOARD": "pico"
+            }
+        },
+        {
+            "name": "pico2",
+            "displayName": "Raspberry Pi Pico 2",
+            "description": "Configure for Raspberry Pi Pico 2 platform (RP2350)",
+            "inherits": [
+                "_pico-root-config"
+            ],
+            "cacheVariables": {
+                "PICO_PLATFORM": "rp2350-arm-s",
+                "PICO_BOARD": "pico2"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "pico",
+            "displayName": "Build for Pico",
+            "configurePreset": "pico"
+        },
+        {
+            "name": "pico2",
+            "displayName": "Build for Pico 2",
+            "configurePreset": "pico2"
+        }
+    ]
+}

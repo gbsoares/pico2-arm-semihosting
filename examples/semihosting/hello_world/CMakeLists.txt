@@ -15,4 +15,6 @@ if (PICO_CYW43_SUPPORTED)
 endif()
 
 # Generate additional output formats (map/bin/hex/uf2)
-pico_add_extra_outputs(${TARGET_NAME})
+if(SEMIHOSTING_PLATFORM STREQUAL "PICO" AND COMMAND pico_add_extra_outputs)
+    pico_add_extra_outputs(${TARGET_NAME})
+endif()

@@ -18,13 +18,11 @@ target_sources(
                 "${CMAKE_CURRENT_SOURCE_DIR}/../../include/semihosting/semihosting.h"
 )
 
-# Link required Pico SDK libraries
-# Note: These are platform-specific dependencies required for hardware functionality
-target_link_libraries(pico.semihosting
-    PUBLIC
-        pico_stdlib
-        hardware_exception
-)
+# Platform-specific dependencies are injected via platform configuration
+# For Pico: see ports/pico/pico-semihosting.cmake
+if(SEMIHOSTING_PLATFORM STREQUAL "PICO" AND COMMAND semihosting_add_pico_dependencies)
+    semihosting_add_pico_dependencies(pico.semihosting)
+endif()
 
 # Following [cmake.passive_projects] - do not set CMAKE_C_STANDARD globally
 # Instead, verify compiler support at configuration time if needed

@@ -1,22 +1,21 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 cmake_minimum_required(VERSION 3.25)
 
-# Pull in Raspberry Pi Pico SDK dependencies (must be before project)
-include(ports/pico/rpi-pico-toolchain.cmake)
+# Pull in SDK import (must be before project) for Pico platform
+if(SEMIHOSTING_PLATFORM STREQUAL "PICO")
+    include(ports/pico/pico_sdk_import.cmake)
+endif()
 
 project(pico.semihosting 
     VERSION 0.1.0
-    LANGUAGES C CXX ASM
+    LANGUAGES C CXX
     DESCRIPTION "ARM semihosting library for Raspberry Pi Pico microcontrollers"
 )
 
-# Verify SDK version requirement
-if (PICO_SDK_VERSION_STRING VERSION_LESS "2.2.0")
-    message(FATAL_ERROR "Raspberry Pi Pico SDK version 2.2.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
+# Include platform-specific initialization (SDK init and dependency injection)
+if(SEMIHOSTING_PLATFORM STREQUAL "PICO")
+    include(ports/pico/pico-semihosting.cmake)
 endif()
-
-# Initialize the Pico SDK
-pico_sdk_init()
 
 # [CMAKE.SKIP_TESTS]
 option(

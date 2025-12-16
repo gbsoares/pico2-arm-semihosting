@@ -9,34 +9,10 @@
             "options": [
                 {
                     "label": "RP2350 (Pico 2)",
-                    "value": "rp2350"
-                },
-                {
-                    "label": "RP2040 (Pico 1)",
-                    "value": "rp2040"
-                }
-            ]
-        },
-        {
-            "id": "picoBoard",
-            "description": "Select the PICO_BOARD",
-            "default": "pico2_w",
-            "type": "pickString",
-            "options": [
-                {
-                    "label": "Pico 2 W",
-                    "value": "pico2_w"
-                },
-                {
-                    "label": "Pico 2",
                     "value": "pico2"
                 },
                 {
-                    "label": "Pico W",
-                    "value": "pico_w"
-                },
-                {
-                    "label": "Pico",
+                    "label": "RP2040 (Pico 1)",
                     "value": "pico"
                 }
             ]
@@ -68,12 +44,8 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "-S",
-                ".",
-                "-B",
-                "build",
-                "-DPICO_PLATFORM=${input:picoPlatform}",
-                "-DPICO_BOARD=${input:picoBoard}"
+                "--preset",
+                "${input:picoPlatform}",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -152,8 +124,8 @@
             "dependsOn": "CMake Configure",
             "command": "cmake",
             "args": [
-                "--build",
-                "build"
+                "--preset",
+                "${input:picoPlatform}",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
