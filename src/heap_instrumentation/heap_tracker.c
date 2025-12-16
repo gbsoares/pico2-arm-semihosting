@@ -207,8 +207,8 @@ void heap_tracked_free(void* ptr)
     heap_operation_record_t record = {.operation = HEAP_OP_FREE,
                                       .timestamp_us = time_us_64(),
                                       .arg1 = (uint32_t)(uintptr_t)ptr,  // ptr
-                                      .arg2 = 0,  // unused
-                                      .arg3 = 0,  // unused
+                                      .arg2 = 0,                         // unused
+                                      .arg3 = 0,                         // unused
                                       .padding = 0};
 
     log_heap_operation(&record);

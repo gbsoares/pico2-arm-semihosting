@@ -1,13 +1,13 @@
-# Define target name
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# Hello World example for pico.semihosting library
 set(TARGET_NAME hello_world)
 
-# Create executable
 add_executable(${TARGET_NAME} main.c)
 
-# Link libraries
+# Link libraries using the new library target name
 target_link_libraries(${TARGET_NAME}
     pico_stdlib
-    semihosting
+    pico.semihosting
 )
 
 if (PICO_CYW43_SUPPORTED)
