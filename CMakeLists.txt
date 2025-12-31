@@ -2,18 +2,24 @@
 cmake_minimum_required(VERSION 3.25)
 
 # Pull in SDK import (must be before project) for Pico platform
-if(SEMIHOSTING_PLATFORM STREQUAL "PICO")
+if(CFG_PLATFORM STREQUAL "PICO")
     include(ports/pico/pico_sdk_import.cmake)
 endif()
 
-project(pico.semihosting 
+project(heapTracer 
     VERSION 0.1.0
     LANGUAGES C CXX
     DESCRIPTION "ARM semihosting library for Raspberry Pi Pico microcontrollers"
 )
 
+# Select heap trace stream backend (set by toolchain/platform; default to semihosting)
+if(NOT DEFINED CFG_STREAM_METHOD)
+    set(CFG_STREAM_METHOD "semihosting" CACHE STRING "Heap trace stream backend (e.g. semihosting, udp)" FORCE)
+endif()
+set_property(CACHE CFG_STREAM_METHOD PROPERTY STRINGS semihosting udp)
+
 # Include platform-specific initialization (SDK init and dependency injection)
-if(SEMIHOSTING_PLATFORM STREQUAL "PICO")
+if(CFG_PLATFORM STREQUAL "PICO")
     include(ports/pico/pico-semihosting.cmake)
 endif()
 
@@ -31,7 +37,12 @@ option(
     ${PROJECT_IS_TOP_LEVEL}
 )
 
-add_subdirectory(stream/semihosting)
+set(_heaptrc_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
+if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")
+    add_subdirectory("${_heaptrc_stream_dir}" "stream/${CFG_STREAM_METHOD}")
+else()
+    message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_heaptrc_stream_dir}")
+endif()
 
 # Conditionally build tests
 if(PICO_SEMIHOSTING_BUILD_TESTS)

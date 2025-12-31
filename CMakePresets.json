@@ -23,7 +23,8 @@
                 "_root-config"
             ],
             "cacheVariables": {
-                "SEMIHOSTING_PLATFORM": "PICO"
+                "CFG_PLATFORM": "PICO",
+                "CFG_STREAM_METHOD": "semihosting"
             }
         },
         {

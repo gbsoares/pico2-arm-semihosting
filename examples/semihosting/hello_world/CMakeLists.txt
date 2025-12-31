@@ -7,7 +7,7 @@ add_executable(${TARGET_NAME} main.c)
 # Link libraries using the new library target name
 target_link_libraries(${TARGET_NAME}
     pico_stdlib
-    pico.semihosting
+    semihosting
 )
 
 if (PICO_CYW43_SUPPORTED)
@@ -15,6 +15,6 @@ if (PICO_CYW43_SUPPORTED)
 endif()
 
 # Generate additional output formats (map/bin/hex/uf2)
-if(SEMIHOSTING_PLATFORM STREQUAL "PICO" AND COMMAND pico_add_extra_outputs)
+if(CFG_PLATFORM STREQUAL "PICO" AND COMMAND pico_add_extra_outputs)
     pico_add_extra_outputs(${TARGET_NAME})
 endif()
