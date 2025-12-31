@@ -5,6 +5,12 @@ A library and examples for ARM semihosting on the Raspberry Pi Pico microcontrol
 - **Semihosting Utilities** - Low-level semihosting system calls for file I/O
 - **Heap Instrumentation** - Memory allocation tracking with binary trace output
 
+## Architecture (planned boundaries)
+- **Instrumentation core**: records heap operations into a buffer and exposes a transport-agnostic API for flushing/closing. No direct Pico SDK dependencies.
+- **Transports**: pluggable sinks that move bytes to the host (first transport is semihosting; future options include UART/serial and UDP). Transports own formatting/wire protocol and expose a minimal `write`/`close` surface.
+- **Platform ports**: platform-specific glue (e.g., HardFault handler install, SDK init) lives under `ports/<platform>/` and injects dependencies into transports at CMake time.
+- **Examples/tools**: platform-specific sample apps plus host-side parsers for the trace format to verify transport + instrumentation end-to-end.
+
 ## Development Container
 
 This project includes a VS Code dev container configuration for easy setup:

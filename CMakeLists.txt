@@ -31,7 +31,7 @@ option(
     ${PROJECT_IS_TOP_LEVEL}
 )
 
-add_subdirectory(src/semihosting)
+add_subdirectory(stream/semihosting)
 
 # Conditionally build tests
 if(PICO_SEMIHOSTING_BUILD_TESTS)
