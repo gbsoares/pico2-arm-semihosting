@@ -47,9 +47,6 @@
                 "--preset",
                 "${input:picoPlatform}",
             ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -66,9 +63,6 @@
                 "--target",
                 "${input:buildTarget}"
             ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -98,9 +92,6 @@
                 "--target",
                 "clean"
             ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
             "group": "build",
             "problemMatcher": []
         },
@@ -112,9 +103,6 @@
                 "-rf",
                 "build"
             ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
             "group": "build",
             "problemMatcher": []
         },
@@ -127,14 +115,63 @@
                 "--preset",
                 "${input:picoPlatform}",
             ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": ["$gcc"]
-        }
+        },
+        {
+            "label": "Tests: Configure (host)",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S",
+                ".",
+                "-B",
+                "build-tests",
+                "-DCFG_BUILD_TESTS=ON"
+            ],
+            "group": "test",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Tests: Build",
+            "type": "shell",
+            "command": "cmake",
+            "dependsOn": "Tests: Configure (host)",
+            "args": [
+                "--build",
+                "build-tests",
+                "--target",
+                "heap_tracker_tests"
+            ],
+            "group": "test",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Tests: Run",
+            "type": "shell",
+            "command": "ctest",
+            "dependsOn": "Tests: Build",
+            "args": [
+                "--test-dir",
+                "build-tests",
+                "--output-on-failure"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tests: Clean All (Remove Build Directory)",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "build-tests"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
     ]
 }

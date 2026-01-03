@@ -4,9 +4,10 @@
 extern "C" {
 #endif
 
-#include <heapTrcDefines.h>
+#include <heapTracerDefines.h>
 #include <heapTracerConfig.h>
 #include <heapTracerStreamConfig.h>
+#include <heap_tracer/heap_tracker.h>
 
 #ifdef __cplusplus
 }

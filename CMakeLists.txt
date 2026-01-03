@@ -25,31 +25,45 @@ endif()
 
 # [CMAKE.SKIP_TESTS]
 option(
-    PICO_SEMIHOSTING_BUILD_TESTS
-    "Enable building tests and test infrastructure. Default: ${PROJECT_IS_TOP_LEVEL}. Values: { ON, OFF }."
-    ${PROJECT_IS_TOP_LEVEL}
+    CFG_BUILD_TESTS
+    "Enable building tests and test infrastructure. Default: OFF. Values: { ON, OFF }."
+    OFF
 )
 
 # [CMAKE.SKIP_EXAMPLES]
 option(
-    PICO_SEMIHOSTING_BUILD_EXAMPLES
+    CFG_BUILD_EXAMPLES
     "Enable building examples. Default: ${PROJECT_IS_TOP_LEVEL}. Values: { ON, OFF }."
     ${PROJECT_IS_TOP_LEVEL}
 )
 
 set(_heaptrc_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
-if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")
-    add_subdirectory("${_heaptrc_stream_dir}" "stream/${CFG_STREAM_METHOD}")
+if(NOT HEAPTRC_TESTS_ONLY)
+    if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")
+        add_subdirectory("${_heaptrc_stream_dir}" "stream/${CFG_STREAM_METHOD}")
+    else()
+        message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_heaptrc_stream_dir}")
+    endif()
 else()
-    message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_heaptrc_stream_dir}")
+    message(STATUS "HEAPTRC_TESTS_ONLY=ON: skipping transport library configuration")
 endif()
 
 # Conditionally build tests
-if(PICO_SEMIHOSTING_BUILD_TESTS)
-    # add_subdirectory(tests)  # Uncomment when tests are added
+if(CFG_BUILD_TESTS)
+    include(CTest)
+    
+    if(CMAKE_CROSSCOMPILING)
+        message(STATUS "Skipping tests - cross compiling")
+    else()
+        add_subdirectory(tests)
+    endif()
 endif()
 
 # Conditionally build examples
-if(PICO_SEMIHOSTING_BUILD_EXAMPLES)
-    add_subdirectory(examples)
+if(CFG_BUILD_EXAMPLES)
+    if(CFG_BUILD_TESTS)
+        message(STATUS "CFG_BUILD_TESTS=ON: skipping examples")
+    else()
+        add_subdirectory(examples)
+    endif()
 endif()
