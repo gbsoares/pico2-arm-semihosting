@@ -33,6 +33,7 @@ target_include_directories(heap_tracker_tests
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/config
 )
+target_compile_definitions(heap_tracker_tests PRIVATE HEAPTRC_TEST_API)
 target_link_libraries(heap_tracker_tests
     PRIVATE
         ${_gtest_target}
