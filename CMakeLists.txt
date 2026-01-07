@@ -6,7 +6,7 @@ if(CFG_PLATFORM STREQUAL "PICO")
     include(ports/pico/pico_sdk_import.cmake)
 endif()
 
-project(heapTracer 
+project(heapInst 
     VERSION 0.1.0
     LANGUAGES C CXX
     DESCRIPTION "ARM semihosting library for Raspberry Pi Pico microcontrollers"
@@ -38,14 +38,14 @@ option(
 )
 
 set(_heaptrc_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
-if(NOT HEAPTRC_TESTS_ONLY)
+if(NOT HEAPINST_TESTS_ONLY)
     if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")
         add_subdirectory("${_heaptrc_stream_dir}" "stream/${CFG_STREAM_METHOD}")
     else()
         message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_heaptrc_stream_dir}")
     endif()
 else()
-    message(STATUS "HEAPTRC_TESTS_ONLY=ON: skipping transport library configuration")
+    message(STATUS "HEAPINST_TESTS_ONLY=ON: skipping transport library configuration")
 endif()
 
 # Conditionally build tests

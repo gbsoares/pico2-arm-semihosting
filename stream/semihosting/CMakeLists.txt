@@ -12,9 +12,12 @@ target_sources(
     semihosting
     PUBLIC
         FILE_SET HEADERS
-            BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/../../include"
+            BASE_DIRS 
+                "${CMAKE_CURRENT_SOURCE_DIR}/include"
+                "${CMAKE_CURRENT_SOURCE_DIR}/../../include"
             FILES
-                "${CMAKE_CURRENT_SOURCE_DIR}/../../include/semihosting/semihosting.h"
+                "${CMAKE_CURRENT_SOURCE_DIR}/include/semihosting.h"
+                "${CMAKE_CURRENT_SOURCE_DIR}/../../include/heapInstApi.h"
 )
 
 # Platform-specific dependencies are injected via platform configuration

@@ -9,12 +9,12 @@ extern "C" {
 #endif
 
 /**
- * @def HEAPTRC_CFG_HARDWARE_PORT
+ * @def HEAPINST_CFG_HARDWARE_PORT
  * @brief Specify what hardware port to use.
  *
- * See heapTracerDefines.h for available ports.
+ * See heapInstDefines.h for available ports.
  */
-#define HEAPTRC_CFG_HARDWARE_PORT HEAPTRC_HARDWARE_PORT_ARM_Cortex_M
+#define HEAPINST_CFG_HARDWARE_PORT HEAPINST_HARDWARE_PORT_ARM_Cortex_M
 
 #ifdef __cplusplus
 }

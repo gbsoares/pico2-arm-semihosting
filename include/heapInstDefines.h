@@ -27,7 +27,7 @@ extern "C" {
  *****************************************************************************/
 
 #define TRC_HARDWARE_PORT_NOT_SET          99
-#define HEAPTRC_HARDWARE_PORT_ARM_Cortex_M 1
+#define HEAPINST_HARDWARE_PORT_ARM_Cortex_M 1
 
 #ifdef __cplusplus
 }

@@ -129,8 +129,9 @@
                 "-S",
                 ".",
                 "-B",
-                "build-tests",
-                "-DCFG_BUILD_TESTS=ON"
+                "build/heap_inst_tests",
+                "-DCFG_BUILD_TESTS=ON",
+                "-DHEAPINST_TESTS_ONLY=ON"
             ],
             "group": "test",
             "problemMatcher": ["$gcc"]
@@ -142,9 +143,9 @@
             "dependsOn": "Tests: Configure (host)",
             "args": [
                 "--build",
-                "build-tests",
+                "build/heap_inst_tests",
                 "--target",
-                "heap_tracker_tests"
+                "heap_inst_tests"
             ],
             "group": "test",
             "problemMatcher": ["$gcc"]
@@ -156,7 +157,7 @@
             "dependsOn": "Tests: Build",
             "args": [
                 "--test-dir",
-                "build-tests",
+                "build/heap_inst_tests",
                 "--output-on-failure"
             ],
             "group": "test",

@@ -1,4 +1,4 @@
-#include "semihosting/semihosting.h"
+#include <semihosting.h>
 #include "semihosting_ops.h"
 #include <string.h>
 #include <stdbool.h>

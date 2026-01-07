@@ -6,13 +6,14 @@
 #include <vector>
 
 extern "C" {
-#include "heap_tracer/heap_tracker.h"
-#ifdef HEAPTRC_TEST_API
-void heap_tracker_test_reset(void);
+#include "heapInst/heapInst.h"
+#ifdef HEAPINST_TEST_API
+void heap_inst_test_reset(void);
 #endif
 }
 
-namespace {
+namespace
+{
 
 struct RecordingClock {
     uint64_t current = 100;
@@ -60,28 +61,29 @@ struct RecordingTransport {
     }
 };
 
-class HeapTrackerTest : public ::testing::Test {
-protected:
+class HeapInstTest : public ::testing::Test
+{
+   protected:
     RecordingClock clock_;
     RecordingLog log_;
     RecordingTransport transport_;
 
     void SetUp() override
     {
-#ifdef HEAPTRC_TEST_API
-        heap_tracker_test_reset();
+#ifdef HEAPINST_TEST_API
+        heap_inst_test_reset();
 #endif
         clock_.current = 100;
         log_.buffer.clear();
         transport_.writes.clear();
         transport_.fail_write = false;
-        heaptrc_transport_t t = {
+        heap_inst_transport_t t = {
             .write = &RecordingTransport::Write,
             .flush = &RecordingTransport::Flush,
             .close = &RecordingTransport::Close,
             .ctx = &transport_,
         };
-        heaptrc_platform_hooks_t hooks = {
+        heap_inst_platform_hooks_t hooks = {
             .timestamp_us = &RecordingClock::Now,
             .log = &RecordingLog::Log,
             .lock = nullptr,
@@ -92,45 +94,44 @@ protected:
             .unlock_ctx = nullptr,
         };
 
-        heap_tracker_register_transport(&t);
-        heap_tracker_register_platform_hooks(&hooks);
+        heap_inst_register_transport(&t);
+        heap_inst_register_platform_hooks(&hooks);
     }
 
-    void TearDown() override { heap_tracker_flush(); }
+    void TearDown() override { heap_inst_flush(); }
 };
 
 }  // namespace
 
-TEST_F(HeapTrackerTest, InitAddsSingleRecord)
+TEST_F(HeapInstTest, InitAddsSingleRecord)
 {
-    heap_tracker_init();
-    EXPECT_TRUE(heap_tracker_is_initialized());
-    EXPECT_EQ(heap_tracker_get_buffer_count(), 1u);
+    heap_inst_init();
+    EXPECT_TRUE(heap_inst_is_initialized());
+    EXPECT_EQ(heap_inst_get_buffer_count(), 1u);
 
-    heap_tracker_flush();
+    heap_inst_flush();
     ASSERT_EQ(transport_.writes.size(), 1u);
-    ASSERT_EQ(transport_.writes[0].size(),
-              sizeof(heap_operation_record_t) * 1);
+    ASSERT_EQ(transport_.writes[0].size(), sizeof(heap_inst_record_t) * 1);
 
-    heap_operation_record_t rec;
+    heap_inst_record_t rec;
     std::memcpy(&rec, transport_.writes[0].data(), sizeof(rec));
     EXPECT_EQ(rec.operation, HEAP_OP_INIT);
     EXPECT_EQ(rec.timestamp_us, 100u);
 }
 
-TEST_F(HeapTrackerTest, RecordsMallocAndFree)
+TEST_F(HeapInstTest, RecordsMallocAndFree)
 {
-    heap_tracker_init();
-    void* ptr = heap_tracked_malloc(16);
+    heap_inst_init();
+    void* ptr = heap_inst_malloc(16);
     ASSERT_NE(ptr, nullptr);
-    heap_tracked_free(ptr);
+    heap_inst_free(ptr);
 
-    heap_tracker_flush();
+    heap_inst_flush();
     ASSERT_EQ(transport_.writes.size(), 1u);
     const auto& buf = transport_.writes[0];
-    ASSERT_EQ(buf.size(), sizeof(heap_operation_record_t) * 3);
+    ASSERT_EQ(buf.size(), sizeof(heap_inst_record_t) * 3);
 
-    std::vector<heap_operation_record_t> recs(3);
+    std::vector<heap_inst_record_t> recs(3);
     std::memcpy(recs.data(), buf.data(), buf.size());
     EXPECT_EQ(recs[0].operation, HEAP_OP_INIT);
     EXPECT_EQ(recs[1].operation, HEAP_OP_MALLOC);
@@ -140,30 +141,30 @@ TEST_F(HeapTrackerTest, RecordsMallocAndFree)
     EXPECT_EQ(recs[2].arg1, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(ptr)));
 }
 
-TEST_F(HeapTrackerTest, FlushesWhenBufferFull)
+TEST_F(HeapInstTest, FlushesWhenBufferFull)
 {
-    heap_tracker_init();
-    size_t capacity = heap_tracker_get_buffer_capacity();
+    heap_inst_init();
+    size_t capacity = heap_inst_get_buffer_capacity();
 
     for (size_t i = 0; i < capacity; ++i) {
-        heap_tracked_malloc(4);
+        heap_inst_malloc(4);
     }
 
-    heap_tracker_flush();
+    heap_inst_flush();
 
     ASSERT_EQ(transport_.writes.size(), 2u);
-    size_t record_size = sizeof(heap_operation_record_t);
+    size_t record_size = sizeof(heap_inst_record_t);
     EXPECT_EQ(transport_.writes[0].size(), capacity * record_size);
     EXPECT_EQ(transport_.writes[1].size(), 1 * record_size);
 }
 
-TEST_F(HeapTrackerTest, FallsBackToTextWhenTransportFails)
+TEST_F(HeapInstTest, FallsBackToTextWhenTransportFails)
 {
     transport_.fail_write = true;
 
-    heap_tracker_init();
-    heap_tracked_malloc(8);
-    heap_tracker_flush();
+    heap_inst_init();
+    heap_inst_malloc(8);
+    heap_inst_flush();
 
     EXPECT_TRUE(transport_.writes.empty());
     ASSERT_NE(log_.buffer.find("HEAP_TRACE_START"), std::string::npos)
@@ -172,5 +173,5 @@ TEST_F(HeapTrackerTest, FallsBackToTextWhenTransportFails)
     ASSERT_NE(log_.buffer.find("OP:1"), std::string::npos)  // HEAP_OP_MALLOC
         << "log buffer:\n"
         << log_.buffer;
-    EXPECT_EQ(heap_tracker_get_buffer_count(), 0u);
+    EXPECT_EQ(heap_inst_get_buffer_count(), 0u);
 }
