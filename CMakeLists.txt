@@ -60,6 +60,19 @@ if(CFG_PLATFORM STREQUAL "PICO")
     include(ports/pico/pico-semihosting.cmake)
 endif()
 
+# -----------------------------------------------------------------------------
+# Heap instrumentation core
+# -----------------------------------------------------------------------------
+add_library(heapInstCore STATIC
+    src/heapInstrumentation/heapInst.c
+)
+target_include_directories(heapInstCore
+    PUBLIC
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/config
+)
+set_property(TARGET heapInstCore PROPERTY C_STANDARD 11)
+
 set(_heaptrc_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
 if(NOT HEAPINST_TESTS_ONLY)
     if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")

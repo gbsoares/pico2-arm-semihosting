@@ -152,22 +152,10 @@
             "dependsOn": "Tests: Build",
             "args": [
                 "--preset",
-                "heap_tests",
-                "--output-on-failure"
+                "heap_tests"
             ],
             "group": "test",
             "problemMatcher": []
-        },
-        {
-            "label": "Tests: Clean All (Remove Build Directory)",
-            "type": "shell",
-            "command": "rm",
-            "args": [
-                "-rf",
-                "build/heap_inst_tests"
-            ],
-            "group": "test",
-            "problemMatcher": []
-        },
+        }
     ]
 }
