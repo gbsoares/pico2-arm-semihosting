@@ -12,21 +12,19 @@ project(heapInst
     DESCRIPTION "ARM semihosting library for Raspberry Pi Pico microcontrollers"
 )
 
-# Select heap trace stream backend (set by toolchain/platform; default to semihosting)
-if(NOT DEFINED CFG_STREAM_METHOD)
-    set(CFG_STREAM_METHOD "semihosting" CACHE STRING "Heap trace stream backend (e.g. semihosting, udp)" FORCE)
-endif()
-set_property(CACHE CFG_STREAM_METHOD PROPERTY STRINGS semihosting udp)
-
-# Include platform-specific initialization (SDK init and dependency injection)
-if(CFG_PLATFORM STREQUAL "PICO")
-    include(ports/pico/pico-semihosting.cmake)
-endif()
-
+# -----------------------------------------------------------------------------
+# Build controls
+# -----------------------------------------------------------------------------
 # [CMAKE.SKIP_TESTS]
 option(
     CFG_BUILD_TESTS
     "Enable building tests and test infrastructure. Default: OFF. Values: { ON, OFF }."
+    OFF
+)
+
+option(
+    HEAPINST_TESTS_ONLY
+    "Skip transport library configuration for host-only test builds."
     OFF
 )
 
@@ -48,6 +46,20 @@ option(
     ${PROJECT_IS_TOP_LEVEL}
 )
 
+# -----------------------------------------------------------------------------
+# Transport selection
+# -----------------------------------------------------------------------------
+# Select heap trace stream backend (set by toolchain/platform; default to semihosting)
+if(NOT DEFINED CFG_STREAM_METHOD)
+    set(CFG_STREAM_METHOD "semihosting" CACHE STRING "Heap trace stream backend (e.g. semihosting, udp)" FORCE)
+endif()
+set_property(CACHE CFG_STREAM_METHOD PROPERTY STRINGS semihosting udp)
+
+# Include platform-specific initialization (SDK init and dependency injection)
+if(CFG_PLATFORM STREQUAL "PICO")
+    include(ports/pico/pico-semihosting.cmake)
+endif()
+
 set(_heaptrc_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
 if(NOT HEAPINST_TESTS_ONLY)
     if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")
@@ -59,7 +71,9 @@ else()
     message(STATUS "HEAPINST_TESTS_ONLY=ON: skipping transport library configuration")
 endif()
 
-# Conditionally build tests
+# -----------------------------------------------------------------------------
+# Unit tests (host)
+# -----------------------------------------------------------------------------
 if(CFG_BUILD_TESTS)
     include(CTest)
     
@@ -70,7 +84,9 @@ if(CFG_BUILD_TESTS)
     endif()
 endif()
 
-# Conditionally build examples
+# -----------------------------------------------------------------------------
+# Examples
+# -----------------------------------------------------------------------------
 if(CFG_BUILD_EXAMPLES)
     if(CFG_BUILD_TESTS)
         message(STATUS "CFG_BUILD_TESTS=ON: skipping examples")
