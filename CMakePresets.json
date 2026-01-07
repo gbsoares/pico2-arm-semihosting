@@ -18,7 +18,6 @@
         {
             "name": "_pico-root-config",
             "hidden": true,
-            "binaryDir": "${sourceDir}/build",
             "inherits": [
                 "_root-config"
             ],
@@ -50,18 +49,55 @@
                 "PICO_PLATFORM": "rp2350-arm-s",
                 "PICO_BOARD": "pico2"
             }
+        },
+        {
+            "name": "heap_tests",
+            "displayName": "Build Tests for Host",
+            "binaryDir": "${sourceDir}/build/tests",
+            "inherits": [
+                "_root-config"
+            ],
+            "cacheVariables": {
+                "CFG_BUILD_EXAMPLES": "OFF",
+                "CFG_BUILD_TESTS": "ON",
+                "HEAPINST_ENABLE_TESTS": "ON"
+            }
         }
     ],
     "buildPresets": [
         {
             "name": "pico",
-            "displayName": "Build for Pico",
-            "configurePreset": "pico"
+            "displayName": "Build Examples for Pico",
+            "configurePreset": "pico",
+            "targets": [
+                "all"
+            ]
         },
         {
             "name": "pico2",
-            "displayName": "Build for Pico 2",
-            "configurePreset": "pico2"
+            "displayName": "Build Examples for Pico 2",
+            "configurePreset": "pico2",
+            "targets": [
+                "all"
+            ]
+        },
+        {
+            "name": "heap_tests",
+            "displayName": "Build Tests for Host",
+            "configurePreset": "heap_tests",
+            "targets": [
+                "heap_inst_tests"
+            ]
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "heap_tests",
+            "displayName": "Run Tests for Host",
+            "configurePreset": "heap_tests",
+            "output": {
+                "outputOnFailure": true
+            }
         }
     ]
 }

@@ -30,6 +30,17 @@ option(
     OFF
 )
 
+option(
+    HEAPINST_ENABLE_TESTS
+    "Convenience flag: enable tests and skip transport configuration for host-only test builds."
+    OFF
+)
+
+if(HEAPINST_ENABLE_TESTS)
+    set(CFG_BUILD_TESTS ON CACHE BOOL "Enable building tests and test infrastructure." FORCE)
+    set(HEAPINST_TESTS_ONLY ON CACHE BOOL "Skip transport library configuration." FORCE)
+endif()
+
 # [CMAKE.SKIP_EXAMPLES]
 option(
     CFG_BUILD_EXAMPLES

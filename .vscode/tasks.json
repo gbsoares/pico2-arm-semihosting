@@ -126,12 +126,8 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "-S",
-                ".",
-                "-B",
-                "build/heap_inst_tests",
-                "-DCFG_BUILD_TESTS=ON",
-                "-DHEAPINST_TESTS_ONLY=ON"
+                "--preset",
+                "heap_tests"
             ],
             "group": "test",
             "problemMatcher": ["$gcc"]
@@ -143,9 +139,8 @@
             "dependsOn": "Tests: Configure (host)",
             "args": [
                 "--build",
-                "build/heap_inst_tests",
-                "--target",
-                "heap_inst_tests"
+                "--preset",
+                "heap_tests"
             ],
             "group": "test",
             "problemMatcher": ["$gcc"]
@@ -156,8 +151,8 @@
             "command": "ctest",
             "dependsOn": "Tests: Build",
             "args": [
-                "--test-dir",
-                "build/heap_inst_tests",
+                "--preset",
+                "heap_tests",
                 "--output-on-failure"
             ],
             "group": "test",
@@ -169,7 +164,7 @@
             "command": "rm",
             "args": [
                 "-rf",
-                "build-tests"
+                "build/heap_inst_tests"
             ],
             "group": "test",
             "problemMatcher": []
