@@ -17,7 +17,29 @@ function(semihosting_add_pico_dependencies target)
             pico_stdlib
             hardware_exception
     )
-    
+
     # Optionally add any Pico-specific compile definitions
     # target_compile_definitions(${target} PRIVATE VAR_NAME=VALUE)
 endfunction()
+
+# -----------------------------------------------------------------------------
+# Pico platform hooks library
+# -----------------------------------------------------------------------------
+# Provides unified platform hook implementations (timestamp, logging, locking)
+# using RP2040/RP2350 peripherals. This library can be linked by applications
+# that need platform-specific hook support for heap instrumentation.
+
+add_library(pico_platform_hooks STATIC
+    ${CMAKE_CURRENT_LIST_DIR}/pico_platform_hooks.c
+)
+
+target_include_directories(pico_platform_hooks
+    PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_link_libraries(pico_platform_hooks
+    PUBLIC
+        heapInstCore
+        pico_time
+)

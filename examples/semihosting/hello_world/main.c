@@ -5,6 +5,7 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include <semihosting.h>
+#include "pico_platform_hooks.h"
 
 // Pico W devices use a GPIO on the WIFI chip for the LED,
 // so when building for Pico W, CYW43_WL_GPIO_LED_PIN will be defined
@@ -37,6 +38,9 @@ void semihost_printf(const char* format, ...)
 
 int main()
 {
+    // Register pico platform hooks for heap instrumentation
+    pico_platform_hooks_register();
+
     // Initialize stdio (includes UART)
     stdio_init_all();
 
