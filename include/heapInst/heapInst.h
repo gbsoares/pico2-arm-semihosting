@@ -95,8 +95,7 @@ typedef struct heap_inst_platform_hooks {
 
 /* Transport and platform registration */
 void heap_inst_register_transport(const heap_inst_transport_t* transport);
-void heap_inst_register_platform_hooks(
-    const heap_inst_platform_hooks_t* hooks);
+void heap_inst_register_platform_hooks(const heap_inst_platform_hooks_t* hooks);
 
 /* Instrumentation lifecycle */
 void heap_inst_init(void);

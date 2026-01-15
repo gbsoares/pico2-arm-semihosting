@@ -10,6 +10,10 @@
                 {
                     "label": "hello_world",
                     "value": "semihosting/hello_world/hello_world"
+                },
+                {
+                    "label": "heap_trace",
+                    "value": "semihosting/heap_trace/heap_trace"
                 }
             ]
         }
