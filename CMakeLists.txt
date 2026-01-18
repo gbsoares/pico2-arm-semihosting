@@ -57,9 +57,11 @@ endif()
 # This INTERFACE library provides the common heapInstStream.h header that defines
 # the API contract between heapInstCore and stream transport implementations.
 add_library(heapInstStream INTERFACE)
-target_include_directories(heapInstStream
+target_sources(heapInstStream
     INTERFACE
-        ${PROJECT_SOURCE_DIR}/include
+        FILE_SET HEADERS
+        BASE_DIRS "${PROJECT_SOURCE_DIR}/include"
+        FILES ${PROJECT_SOURCE_DIR}/include/heapInstStream.h
 )
 
 # -----------------------------------------------------------------------------
