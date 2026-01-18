@@ -89,10 +89,17 @@ bool heap_inst_is_initialized(void);
 size_t heap_inst_get_buffer_count(void);
 size_t heap_inst_get_buffer_capacity(void);
 
-/* Tracked allocation wrappers */
-void* heap_inst_malloc(size_t size);
-void heap_inst_free(void* ptr);
-void* heap_inst_realloc(void* ptr, size_t size);
+/*
+ * Internal recording functions (used by linker wrappers in heapInst_wrap.c).
+ * These record operations without performing the actual allocation, allowing
+ * the __wrap_* functions to handle allocation separately.
+ *
+ * Applications should NOT call these directly - they are called automatically
+ * by the linker-wrapped malloc/free/realloc/calloc functions.
+ */
+void heap_inst_record_malloc(size_t size, void* result);
+void heap_inst_record_free(void* ptr);
+void heap_inst_record_realloc(void* old_ptr, size_t new_size, void* result);
 
 #ifdef __cplusplus
 }

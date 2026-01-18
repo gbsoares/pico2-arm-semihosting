@@ -6,10 +6,14 @@
  * various heap operations (malloc, free, realloc) and streaming the trace
  * data to the debugger host via ARM semihosting.
  *
+ * With HEAPINST_AUTO_WRAP enabled (default), all standard malloc/free/realloc
+ * calls are automatically instrumented - no need to call malloc etc.
+ *
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "hardware/gpio.h"
@@ -119,7 +123,8 @@ int main(void)
 
     /*
      * Step 2: Initialize the heap instrumentation system.
-     * After this call, all heap_inst_malloc/free/realloc calls will be traced.
+     * With HEAPINST_AUTO_WRAP enabled (the default), all standard malloc/free/
+     * realloc calls are automatically traced via linker --wrap flags.
      */
     heap_inst_init();
     printf("Heap instrumentation initialized\n");
@@ -132,7 +137,7 @@ int main(void)
      */
     printf("\n--- Performing malloc operations ---\n");
     for (int i = 0; i < DEMO_ALLOC_COUNT; i++) {
-        ptrs[i] = heap_inst_malloc(g_alloc_sizes[i]);
+        ptrs[i] = malloc(g_alloc_sizes[i]);
         if (ptrs[i] != NULL) {
             /* Write a pattern to the memory to simulate actual usage */
             memset(ptrs[i], (uint8_t)(i + 1), g_alloc_sizes[i]);
@@ -151,11 +156,11 @@ int main(void)
      * Allocate a small block, then grow it. The trace captures both operations.
      */
     printf("\n--- Performing realloc operation ---\n");
-    realloc_ptr = heap_inst_malloc(16);
+    realloc_ptr = malloc(16);
     printf("Initial malloc(16) = %p\n", realloc_ptr);
 
     if (realloc_ptr != NULL) {
-        void *new_ptr = heap_inst_realloc(realloc_ptr, 256);
+        void *new_ptr = realloc(realloc_ptr, 256);
         if (new_ptr != NULL) {
             printf("realloc(%p, 256) = %p\n", realloc_ptr, new_ptr);
             realloc_ptr = new_ptr;
@@ -180,7 +185,7 @@ int main(void)
     for (int i = 1; i < DEMO_ALLOC_COUNT; i++) {
         if (ptrs[i] != NULL) {
             printf("free(%p)\n", ptrs[i]);
-            heap_inst_free(ptrs[i]);
+            free(ptrs[i]);
             ptrs[i] = NULL;
         }
     }
@@ -188,7 +193,7 @@ int main(void)
     /* Free the reallocated block */
     if (realloc_ptr != NULL) {
         printf("free(%p) [realloc block]\n", realloc_ptr);
-        heap_inst_free(realloc_ptr);
+        free(realloc_ptr);
         realloc_ptr = NULL;
     }
 

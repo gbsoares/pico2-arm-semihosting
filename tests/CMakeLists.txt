@@ -19,6 +19,7 @@ target_compile_definitions(heapInstCore PRIVATE HEAPINST_TEST_API HEAPINST_CFG_B
 target_include_directories(heapInstCore PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(heap_inst_tests
+    ${PROJECT_SOURCE_DIR}/src/heapInst_wrap.c
     heapInstTest.cpp
     heapInstTestShims.c
     heapInstStream.c

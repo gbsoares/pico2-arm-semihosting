@@ -58,8 +58,7 @@
             ],
             "cacheVariables": {
                 "CFG_BUILD_EXAMPLES": "OFF",
-                "CFG_BUILD_TESTS": "ON",
-                "HEAPINST_ENABLE_TESTS": "ON"
+                "CFG_BUILD_TESTS": "ON"
             }
         }
     ],

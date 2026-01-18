@@ -9,6 +9,18 @@ if (PICO_SDK_VERSION_STRING VERSION_LESS "2.2.0")
     message(FATAL_ERROR "Raspberry Pi Pico SDK version 2.2.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
 
+# -----------------------------------------------------------------------------
+# Pico SDK malloc wrapper compatibility
+# -----------------------------------------------------------------------------
+# The Pico SDK also defines __wrap_malloc (in pico_malloc). To allow both our
+# wrapper and theirs to coexist (with ours taking precedence based on link order),
+# we need --allow-multiple-definition.
+#
+# IMPORTANT: Applications must include heapInst_wrap.c as their FIRST source file
+# to ensure our __wrap_malloc is linked before Pico SDK's version.
+set(HEAPINST_PICO_LINK_OPTIONS -Wl,--allow-multiple-definition CACHE STRING
+    "Pico-specific linker options for heap instrumentation")
+
 # Function to add Pico-specific dependencies to the semihosting library
 function(semihosting_add_pico_dependencies target)
     # Link required Pico SDK libraries for hardware functionality

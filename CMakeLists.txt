@@ -15,29 +15,17 @@ project(heapInst
 # -----------------------------------------------------------------------------
 # Build controls
 # -----------------------------------------------------------------------------
-# [CMAKE.SKIP_TESTS]
 option(
     CFG_BUILD_TESTS
-    "Enable building tests and test infrastructure. Default: OFF. Values: { ON, OFF }."
+    "Enable building tests. Tests run on host; skipped when cross-compiling."
     OFF
 )
 
 option(
-    HEAPINST_TESTS_ONLY
-    "Skip transport library configuration for host-only test builds."
-    OFF
+    HEAPINST_AUTO_WRAP
+    "Enable automatic malloc/free/realloc instrumentation via linker wrapping."
+    ON
 )
-
-option(
-    HEAPINST_ENABLE_TESTS
-    "Convenience flag: enable tests and skip transport configuration for host-only test builds."
-    OFF
-)
-
-if(HEAPINST_ENABLE_TESTS)
-    set(CFG_BUILD_TESTS ON CACHE BOOL "Enable building tests and test infrastructure." FORCE)
-    set(HEAPINST_TESTS_ONLY ON CACHE BOOL "Skip transport library configuration." FORCE)
-endif()
 
 # [CMAKE.SKIP_EXAMPLES]
 option(
@@ -45,6 +33,7 @@ option(
     "Enable building examples. Default: ${PROJECT_IS_TOP_LEVEL}. Values: { ON, OFF }."
     ${PROJECT_IS_TOP_LEVEL}
 )
+
 
 # Include platform-specific initialization (SDK init and dependency injection)
 if(CFG_PLATFORM STREQUAL "PICO")
@@ -82,16 +71,41 @@ target_link_libraries(heapInstCore
 set_property(TARGET heapInstCore PROPERTY C_STANDARD 11)
 
 # -----------------------------------------------------------------------------
+# Automatic malloc/free wrapping (works on any platform with GNU linker)
+# -----------------------------------------------------------------------------
+# When enabled, all malloc/free/realloc/calloc calls are automatically
+# instrumented via linker --wrap flags. This works on Linux hosts and
+# embedded targets using the GNU toolchain.
+#
+# Applications must include heapInst_wrap.c in their sources:
+#   add_executable(my_app
+#       ${heapInst_SOURCE_DIR}/src/heapInst_wrap.c
+#       main.c
+#   )
+if(HEAPINST_AUTO_WRAP)
+    # Export source directory for applications to reference heapInst_wrap.c
+    set(heapInst_SOURCE_DIR ${PROJECT_SOURCE_DIR} CACHE PATH
+        "heapInst source directory for accessing heapInst_wrap.c")
+
+    # Add linker wrap flags to redirect malloc/free/realloc/calloc
+    target_link_options(heapInstCore PUBLIC
+        -Wl,--wrap=malloc
+        -Wl,--wrap=calloc
+        -Wl,--wrap=realloc
+        -Wl,--wrap=free
+    )
+
+    message(STATUS "HEAPINST_AUTO_WRAP=ON: malloc/free/realloc/calloc will be automatically instrumented")
+endif()
+
+# -----------------------------------------------------------------------------
 # Stream transport libraries
 # -----------------------------------------------------------------------------
 # Each stream transport provides heapInstStreamPort_* symbols. Applications link
 # both heapInstCore and their chosen stream transport library.
-# The common heapInstStream.h interface is in include/ so heapInstCore can compile
-# without knowing which transport will be linked.
-if(NOT HEAPINST_TESTS_ONLY)
+# Transport libraries are platform-specific (require SDK), so only build on Pico.
+if(CFG_PLATFORM STREQUAL "PICO")
     add_subdirectory(stream/semihosting)
-else()
-    message(STATUS "HEAPINST_TESTS_ONLY=ON: skipping transport library configuration")
 endif()
 
 # -----------------------------------------------------------------------------
@@ -111,9 +125,5 @@ endif()
 # Examples
 # -----------------------------------------------------------------------------
 if(CFG_BUILD_EXAMPLES)
-    if(CFG_BUILD_TESTS)
-        message(STATUS "CFG_BUILD_TESTS=ON: skipping examples")
-    else()
-        add_subdirectory(examples)
-    endif()
+    add_subdirectory(examples)
 endif()

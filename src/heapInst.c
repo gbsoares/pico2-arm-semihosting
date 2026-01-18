@@ -6,24 +6,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-
-#if __has_include(<sys/reent.h>)
-#include <sys/reent.h>
-#else
-/* Minimal newlib-compatible stub for host builds that lack sys/reent.h */
-struct _reent {
-    int _errno;
-};
-extern struct _reent* _impure_ptr;
-#endif
-
-// Forward declarations for the original malloc functions from newlib
-void* _malloc_r(struct _reent* r, size_t size);
-void _free_r(struct _reent* r, void* ptr);
-void* _realloc_r(struct _reent* r, void* ptr, size_t size);
-extern struct _reent* _impure_ptr;
 
 // Static buffer for tracking heap operations
 static heap_inst_record_t
@@ -186,29 +169,34 @@ void heap_inst_flush(void)
     }
 }
 
-void* heap_inst_malloc(size_t size)
+bool heap_inst_is_initialized(void) { return tracker_initialized; }
+
+/*
+ * Internal recording functions for use by linker wrappers (heapInst_wrap.c).
+ * These allow the __wrap_* functions to record operations without duplicating
+ * the buffering and transport logic.
+ */
+
+void heap_inst_record_malloc(size_t size, void* result)
 {
     if (!tracker_initialized) {
         heap_inst_init();
     }
 
-    void* result = _malloc_r(_impure_ptr, size);
-
     heap_inst_record_t record = {
         .operation = HEAP_OP_MALLOC,
         .timestamp_us = heaptrc_timestamp_us(),
-        .arg1 = (uint32_t)size,               // size
-        .arg2 = (uint32_t)(uintptr_t)result,  // result_ptr
-        .arg3 = 0,                            // unused
+        .arg1 = (uint32_t)size,
+        .arg2 = (uint32_t)(uintptr_t)result,
+        .arg3 = 0,
         .padding = 0};
 
     log_heap_operation(&record);
     heaptrc_logf("[MALLOC] Requested %zu bytes, allocated at %p\n", size,
                  result);
-    return result;
 }
 
-void heap_inst_free(void* ptr)
+void heap_inst_record_free(void* ptr)
 {
     if (!tracker_initialized) {
         heap_inst_init();
@@ -216,9 +204,9 @@ void heap_inst_free(void* ptr)
 
     heap_inst_record_t record = {.operation = HEAP_OP_FREE,
                                  .timestamp_us = heaptrc_timestamp_us(),
-                                 .arg1 = (uint32_t)(uintptr_t)ptr,  // ptr
-                                 .arg2 = 0,                         // unused
-                                 .arg3 = 0,                         // unused
+                                 .arg1 = (uint32_t)(uintptr_t)ptr,
+                                 .arg2 = 0,
+                                 .arg3 = 0,
                                  .padding = 0};
 
     log_heap_operation(&record);
@@ -228,41 +216,35 @@ void heap_inst_free(void* ptr)
     } else {
         heaptrc_logf("[FREE] Attempted to free NULL pointer\n");
     }
-    _free_r(_impure_ptr, ptr);
 }
 
-void* heap_inst_realloc(void* ptr, size_t size)
+void heap_inst_record_realloc(void* old_ptr, size_t new_size, void* result)
 {
     if (!tracker_initialized) {
         heap_inst_init();
     }
 
-    void* result = _realloc_r(_impure_ptr, ptr, size);
-
     heap_inst_record_t record = {
         .operation = HEAP_OP_REALLOC,
         .timestamp_us = heaptrc_timestamp_us(),
-        .arg1 = (uint32_t)(uintptr_t)ptr,     // old_ptr
-        .arg2 = (uint32_t)size,               // new_size
-        .arg3 = (uint32_t)(uintptr_t)result,  // result_ptr
+        .arg1 = (uint32_t)(uintptr_t)old_ptr,
+        .arg2 = (uint32_t)new_size,
+        .arg3 = (uint32_t)(uintptr_t)result,
         .padding = 0};
 
     log_heap_operation(&record);
 
-    if (ptr == NULL) {
+    if (old_ptr == NULL) {
         heaptrc_logf(
             "[REALLOC] NULL -> %zu bytes (like malloc), allocated at %p\n",
-            size, result);
-    } else if (size == 0) {
-        heaptrc_logf("[REALLOC] %p -> 0 bytes (like free)\n", ptr);
+            new_size, result);
+    } else if (new_size == 0) {
+        heaptrc_logf("[REALLOC] %p -> 0 bytes (like free)\n", old_ptr);
     } else {
-        heaptrc_logf("[REALLOC] %p -> %zu bytes, new address: %p\n", ptr, size,
-                     result);
+        heaptrc_logf("[REALLOC] %p -> %zu bytes, new address: %p\n", old_ptr,
+                     new_size, result);
     }
-    return result;
 }
-
-bool heap_inst_is_initialized(void) { return tracker_initialized; }
 
 size_t heap_inst_get_buffer_count(void) { return buffer_index; }
 
