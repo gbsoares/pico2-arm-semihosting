@@ -46,19 +46,21 @@ option(
     ${PROJECT_IS_TOP_LEVEL}
 )
 
-# -----------------------------------------------------------------------------
-# Transport selection
-# -----------------------------------------------------------------------------
-# Select heap trace stream backend (set by toolchain/platform; default to semihosting)
-if(NOT DEFINED CFG_STREAM_METHOD)
-    set(CFG_STREAM_METHOD "semihosting" CACHE STRING "Heap trace stream backend (e.g. semihosting, udp)" FORCE)
-endif()
-set_property(CACHE CFG_STREAM_METHOD PROPERTY STRINGS semihosting udp)
-
 # Include platform-specific initialization (SDK init and dependency injection)
 if(CFG_PLATFORM STREQUAL "PICO")
     include(ports/pico/pico-semihosting.cmake)
 endif()
+
+# -----------------------------------------------------------------------------
+# Stream port interface (header-only)
+# -----------------------------------------------------------------------------
+# This INTERFACE library provides the common heapInstStream.h header that defines
+# the API contract between heapInstCore and stream transport implementations.
+add_library(heapInstStream INTERFACE)
+target_include_directories(heapInstStream
+    INTERFACE
+        ${PROJECT_SOURCE_DIR}/include
+)
 
 # -----------------------------------------------------------------------------
 # Heap instrumentation core
@@ -71,33 +73,21 @@ target_include_directories(heapInstCore
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/config
 )
+target_link_libraries(heapInstCore
+    PRIVATE
+        heapInstStream
+)
 set_property(TARGET heapInstCore PROPERTY C_STANDARD 11)
 
 # -----------------------------------------------------------------------------
-# Streamport libraries (built separately, linked by examples/applications)
+# Stream transport libraries
 # -----------------------------------------------------------------------------
 # Each stream transport provides heapInstStreamPort_* symbols. Applications link
-# both heapInstCore and their chosen stream transport - the linker resolves the
-# stream transport calls from whichever library is linked.
-#
-# heapInstCore needs the stream transport header (heapInstStream.h) at compile time,
-# but the actual implementation is provided by whichever stream transport library
-# the application links.
-set(_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
+# both heapInstCore and their chosen stream transport library.
+# The common heapInstStream.h interface is in include/ so heapInstCore can compile
+# without knowing which transport will be linked.
 if(NOT HEAPINST_TESTS_ONLY)
-    if(EXISTS "${_stream_dir}/CMakeLists.txt")
-        add_subdirectory("${_stream_dir}" "stream/${CFG_STREAM_METHOD}")
-        # Provide stream transport header to heapInstCore for compilation.
-        # Note: We only add the INCLUDE path, not link the library.
-        # The linker will resolve heapInstStreamPort_* from whatever
-        # stream transport the final executable links.
-        target_include_directories(heapInstCore
-            PRIVATE
-                ${_stream_dir}/include
-        )
-    else()
-        message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_stream_dir}")
-    endif()
+    add_subdirectory(stream/semihosting)
 else()
     message(STATUS "HEAPINST_TESTS_ONLY=ON: skipping transport library configuration")
 endif()

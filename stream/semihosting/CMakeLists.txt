@@ -16,13 +16,18 @@ target_sources(
                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
             FILES
                 "${CMAKE_CURRENT_SOURCE_DIR}/include/semihosting.h"
-                "${CMAKE_CURRENT_SOURCE_DIR}/include/heapInstStream.h"
 )
 
-# Export include directories so consumers (heapInstCore, examples) can find heapInstStream.h
+# Export include directories for semihosting-specific headers
 target_include_directories(semihosting
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# Link to heapInstStream interface for the common stream port API header
+target_link_libraries(semihosting
+    PRIVATE
+        heapInstStream
 )
 
 # Platform-specific dependencies are injected via platform configuration
