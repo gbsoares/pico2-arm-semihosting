@@ -64,7 +64,7 @@ endif()
 # Heap instrumentation core
 # -----------------------------------------------------------------------------
 add_library(heapInstCore STATIC
-    src/heapInstrumentation/heapInst.c
+    src/heapInst.c
 )
 target_include_directories(heapInstCore
     PUBLIC
@@ -77,6 +77,8 @@ set(_heaptrc_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}
 if(NOT HEAPINST_TESTS_ONLY)
     if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")
         add_subdirectory("${_heaptrc_stream_dir}" "stream/${CFG_STREAM_METHOD}")
+        # Link heapInstCore to the selected streamport
+        target_link_libraries(heapInstCore PRIVATE semihosting)
     else()
         message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_heaptrc_stream_dir}")
     endif()
