@@ -13,16 +13,21 @@ if(NOT TARGET ${_gtest_target})
     FetchContent_MakeAvailable(googletest)
 endif()
 
+# Configure heapInstCore for testing
 target_compile_definitions(heapInstCore PRIVATE HEAPINST_TEST_API HEAPINST_CFG_BUFFER_SIZE=256)
+# Provide test streamport header to heapInstCore
+target_include_directories(heapInstCore PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(heap_inst_tests
     heapInstTest.cpp
     heapInstTestShims.c
+    heapInstStream.c
 )
 target_include_directories(heap_inst_tests
     PRIVATE
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/config
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_compile_definitions(heap_inst_tests PRIVATE HEAPINST_TEST_API)
 target_link_libraries(heap_inst_tests

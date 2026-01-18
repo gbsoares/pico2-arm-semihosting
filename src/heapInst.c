@@ -1,4 +1,5 @@
 #include "heapInst/heapInst.h"
+#include "heapInstStream.h"
 
 #include <inttypes.h>
 #include <stdarg.h>
@@ -29,8 +30,8 @@ static heap_inst_record_t
     heap_buffer[HEAP_INST_BUFFER_SIZE / sizeof(heap_inst_record_t)];
 static size_t buffer_index = 0;
 static bool tracker_initialized = false;
+static bool streamport_available = false;
 
-static heap_inst_transport_t g_transport = {0};
 static heap_inst_platform_hooks_t g_platform_hooks = {0};
 
 static void heapInst_lock(void)
@@ -70,15 +71,7 @@ static uint64_t heaptrc_timestamp_us(void)
     return 0;
 }
 
-static int heaptrc_transport_write(const void* data, size_t len)
-{
-    if (!g_transport.write) {
-        return -1;
-    }
-    return g_transport.write(data, len, g_transport.ctx);
-}
-
-// Function to flush buffer to the registered transport (or console fallback)
+// Function to flush buffer to the streamport (or console fallback)
 static void flush_buffer_to_transport(void)
 {
     if (buffer_index == 0) return;
@@ -86,28 +79,24 @@ static void flush_buffer_to_transport(void)
     size_t expected_bytes = buffer_index * sizeof(heap_inst_record_t);
     bool wrote_all = false;
 
-    if (g_transport.write) {
+    if (streamport_available) {
         int bytes_written =
-            heaptrc_transport_write(heap_buffer, expected_bytes);
+            heapInstStreamPort_Write(heap_buffer, expected_bytes);
         wrote_all = (bytes_written >= 0) &&
                     ((size_t)bytes_written == expected_bytes);
 
         if (!wrote_all) {
             heaptrc_logf(
-                "[HEAP_TRACKER] Transport write short (%d/%zu bytes)\n",
+                "[HEAP_TRACKER] Streamport write short (%d/%zu bytes)\n",
                 bytes_written, expected_bytes);
         }
 
-        if (g_transport.flush) {
-            g_transport.flush(g_transport.ctx);
-        }
+        heapInstStreamPort_Flush();
     }
 
     if (!wrote_all) {
-        if (!g_transport.write) {
-            heaptrc_logf(
-                "[HEAP_TRACKER] No transport registered; emitting text "
-                "trace\n");
+        if (!streamport_available) {
+            heaptrc_logf("[HEAP_TRACKER] Streamport unavailable; emitting text trace\n");
         } else {
             heaptrc_logf("[HEAP_TRACKER] Falling back to text trace\n");
         }
@@ -168,6 +157,9 @@ void heap_inst_init(void)
     tracker_initialized = true;
     buffer_index = 0;
 
+    /* Initialize streamport */
+    streamport_available = (heapInstStreamPort_Init() == 0);
+
     uint64_t current_time = heaptrc_timestamp_us();
     heaptrc_logf("[HEAP_TRACKER] Current timestamp_us(): %llu\n",
                  (unsigned long long)current_time);
@@ -191,9 +183,6 @@ void heap_inst_flush(void)
 {
     if (tracker_initialized && buffer_index > 0) {
         flush_buffer_to_transport();
-    }
-    if (g_transport.close) {
-        g_transport.close(g_transport.ctx);
     }
 }
 
@@ -282,15 +271,6 @@ size_t heap_inst_get_buffer_capacity(void)
     return sizeof(heap_buffer) / sizeof(heap_buffer[0]);
 }
 
-void heap_inst_register_transport(const heap_inst_transport_t* transport)
-{
-    if (transport) {
-        g_transport = *transport;
-    } else {
-        memset(&g_transport, 0, sizeof(g_transport));
-    }
-}
-
 void heap_inst_register_platform_hooks(
     const heap_inst_platform_hooks_t* hooks)
 {
@@ -305,9 +285,9 @@ void heap_inst_register_platform_hooks(
 void heap_inst_test_reset(void)
 {
     tracker_initialized = false;
+    streamport_available = false;
     buffer_index = 0;
     memset(heap_buffer, 0, sizeof(heap_buffer));
-    memset(&g_transport, 0, sizeof(g_transport));
     memset(&g_platform_hooks, 0, sizeof(g_platform_hooks));
 }
 #endif

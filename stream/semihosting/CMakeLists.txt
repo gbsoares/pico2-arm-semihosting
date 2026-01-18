@@ -5,19 +5,18 @@ add_library(semihosting)
 target_sources(semihosting
     PRIVATE
         semihosting.c
-        semihosting_ops.h
+        heapInstStream.c
 )
 
 target_sources(
     semihosting
     PUBLIC
         FILE_SET HEADERS
-            BASE_DIRS 
+            BASE_DIRS
                 "${CMAKE_CURRENT_SOURCE_DIR}/include"
-                "${CMAKE_CURRENT_SOURCE_DIR}/../../include"
             FILES
                 "${CMAKE_CURRENT_SOURCE_DIR}/include/semihosting.h"
-                "${CMAKE_CURRENT_SOURCE_DIR}/../../include/heapInstApi.h"
+                "${CMAKE_CURRENT_SOURCE_DIR}/include/heapInstStream.h"
 )
 
 # Platform-specific dependencies are injected via platform configuration

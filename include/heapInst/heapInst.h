@@ -59,22 +59,6 @@ typedef struct heap_inst_record {
 } heap_inst_record_t;
 
 /**
- * @brief Transport callbacks used by the instrumentation core.
- *
- * A transport is responsible for moving raw record bytes to a host or sink.
- */
-typedef int (*heap_inst_write_fn)(const void* data, size_t len, void* ctx);
-typedef int (*heap_inst_flush_fn)(void* ctx);
-typedef int (*heap_inst_close_fn)(void* ctx);
-
-typedef struct heap_inst_transport {
-    heap_inst_write_fn write; /* required: returns bytes written or <0 on error */
-    heap_inst_flush_fn flush; /* optional: force out buffered data */
-    heap_inst_close_fn close; /* optional: release transport resources */
-    void* ctx;                /* opaque pointer passed to callbacks */
-} heap_inst_transport_t;
-
-/**
  * @brief Platform hooks injected by the port layer.
  */
 typedef uint64_t (*heap_inst_timestamp_fn)(void* ctx);
@@ -93,8 +77,7 @@ typedef struct heap_inst_platform_hooks {
     void* unlock_ctx;
 } heap_inst_platform_hooks_t;
 
-/* Transport and platform registration */
-void heap_inst_register_transport(const heap_inst_transport_t* transport);
+/* Platform hooks registration */
 void heap_inst_register_platform_hooks(const heap_inst_platform_hooks_t* hooks);
 
 /* Instrumentation lifecycle */

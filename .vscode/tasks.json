@@ -32,6 +32,10 @@
                     "value": "hello_world"
                 },
                 {
+                    "label": "Heap Trace",
+                    "value": "heap_trace"
+                },
+                {
                     "label": "Semihosting Library",
                     "value": "semihosting"
                 }

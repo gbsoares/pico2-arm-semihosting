@@ -115,32 +115,31 @@ int main(void)
     /* Blink twice to indicate program start */
     led_blink(2, 100, 100);
 
-    printf("UART: Heap trace demo starting\n");
-    semihost_printf("=== Heap Instrumentation Demo ===\n");
+    printf("=== Heap Instrumentation Demo ===\n");
 
     /*
      * Step 2: Initialize the heap instrumentation system.
      * After this call, all heap_inst_malloc/free/realloc calls will be traced.
      */
     heap_inst_init();
-    semihost_printf("Heap instrumentation initialized\n");
-    semihost_printf("Buffer capacity: %u records\n",
+    printf("Heap instrumentation initialized\n");
+    printf("Buffer capacity: %u records\n",
                     (unsigned)heap_inst_get_buffer_capacity());
 
     /*
      * Step 3: Demonstrate malloc operations with various sizes.
      * Each allocation is recorded in the trace buffer with a timestamp.
      */
-    semihost_printf("\n--- Performing malloc operations ---\n");
+    printf("\n--- Performing malloc operations ---\n");
     for (int i = 0; i < DEMO_ALLOC_COUNT; i++) {
         ptrs[i] = heap_inst_malloc(g_alloc_sizes[i]);
         if (ptrs[i] != NULL) {
             /* Write a pattern to the memory to simulate actual usage */
             memset(ptrs[i], (uint8_t)(i + 1), g_alloc_sizes[i]);
-            semihost_printf("malloc(%u) = %p\n", (unsigned)g_alloc_sizes[i],
+            printf("malloc(%u) = %p\n", (unsigned)g_alloc_sizes[i],
                             ptrs[i]);
         } else {
-            semihost_printf("malloc(%u) FAILED\n", (unsigned)g_alloc_sizes[i]);
+            printf("malloc(%u) FAILED\n", (unsigned)g_alloc_sizes[i]);
         }
     }
 
@@ -151,17 +150,17 @@ int main(void)
      * Step 4: Demonstrate realloc operation.
      * Allocate a small block, then grow it. The trace captures both operations.
      */
-    semihost_printf("\n--- Performing realloc operation ---\n");
+    printf("\n--- Performing realloc operation ---\n");
     realloc_ptr = heap_inst_malloc(16);
-    semihost_printf("Initial malloc(16) = %p\n", realloc_ptr);
+    printf("Initial malloc(16) = %p\n", realloc_ptr);
 
     if (realloc_ptr != NULL) {
         void *new_ptr = heap_inst_realloc(realloc_ptr, 256);
         if (new_ptr != NULL) {
-            semihost_printf("realloc(%p, 256) = %p\n", realloc_ptr, new_ptr);
+            printf("realloc(%p, 256) = %p\n", realloc_ptr, new_ptr);
             realloc_ptr = new_ptr;
         } else {
-            semihost_printf("realloc FAILED, keeping original pointer\n");
+            printf("realloc FAILED, keeping original pointer\n");
         }
     }
 
@@ -169,18 +168,18 @@ int main(void)
      * Step 5: Demonstrate free operations.
      * Free most allocations but deliberately skip one to simulate a memory leak.
      */
-    semihost_printf("\n--- Performing free operations ---\n");
+    printf("\n--- Performing free operations ---\n");
 
     /* Intentionally leak the first allocation for demonstration */
     leaked_ptr = ptrs[0];
     ptrs[0] = NULL;
-    semihost_printf("Intentionally leaking allocation at %p (simulated leak)\n",
+    printf("Intentionally leaking allocation at %p (simulated leak)\n",
                     leaked_ptr);
 
     /* Free the remaining allocations */
     for (int i = 1; i < DEMO_ALLOC_COUNT; i++) {
         if (ptrs[i] != NULL) {
-            semihost_printf("free(%p)\n", ptrs[i]);
+            printf("free(%p)\n", ptrs[i]);
             heap_inst_free(ptrs[i]);
             ptrs[i] = NULL;
         }
@@ -188,7 +187,7 @@ int main(void)
 
     /* Free the reallocated block */
     if (realloc_ptr != NULL) {
-        semihost_printf("free(%p) [realloc block]\n", realloc_ptr);
+        printf("free(%p) [realloc block]\n", realloc_ptr);
         heap_inst_free(realloc_ptr);
         realloc_ptr = NULL;
     }
@@ -201,26 +200,24 @@ int main(void)
      * In a real application, you might flush periodically or when the buffer
      * reaches a certain threshold.
      */
-    semihost_printf("\n--- Flushing trace buffer ---\n");
-    semihost_printf("Buffer contains %u records before flush\n",
+    printf("\n--- Flushing trace buffer ---\n");
+    printf("Buffer contains %u records before flush\n",
                     (unsigned)heap_inst_get_buffer_count());
 
     heap_inst_flush();
-    semihost_printf("Trace buffer flushed\n");
+    printf("Trace buffer flushed\n");
 
     /*
      * Summary output
      */
-    semihost_printf("\n=== Demo Complete ===\n");
-    semihost_printf("Performed:\n");
-    semihost_printf("  - %d malloc operations\n", DEMO_ALLOC_COUNT + 1);
-    semihost_printf("  - 1 realloc operation\n");
-    semihost_printf("  - %d free operations\n", DEMO_ALLOC_COUNT);
-    semihost_printf("  - 1 intentional leak at %p\n", leaked_ptr);
-    semihost_printf("\nAnalyze the trace data on the host to see the full\n");
-    semihost_printf("allocation timeline with timestamps.\n");
-
-    printf("UART: Heap trace demo complete\n");
+    printf("\n=== Demo Complete ===\n");
+    printf("Performed:\n");
+    printf("  - %d malloc operations\n", DEMO_ALLOC_COUNT + 1);
+    printf("  - 1 realloc operation\n");
+    printf("  - %d free operations\n", DEMO_ALLOC_COUNT);
+    printf("  - 1 intentional leak at %p\n", leaked_ptr);
+    printf("\nAnalyze the trace data on the host to see the full\n");
+    printf("allocation timeline with timestamps.\n");
 
     /* Final blink pattern to indicate completion (3 rapid blinks) */
     led_blink(3, 50, 50);
