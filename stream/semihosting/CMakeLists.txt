@@ -19,6 +19,12 @@ target_sources(
                 "${CMAKE_CURRENT_SOURCE_DIR}/include/heapInstStream.h"
 )
 
+# Export include directories so consumers (heapInstCore, examples) can find heapInstStream.h
+target_include_directories(semihosting
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
 # Platform-specific dependencies are injected via platform configuration
 # For Pico: see ports/pico/pico-semihosting.cmake
 if(CFG_PLATFORM STREQUAL "PICO" AND COMMAND semihosting_add_pico_dependencies)

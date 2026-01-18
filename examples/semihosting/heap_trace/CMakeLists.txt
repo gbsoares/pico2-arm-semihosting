@@ -7,8 +7,8 @@ add_executable(${TARGET_NAME} main.c)
 target_link_libraries(${TARGET_NAME}
     pico_stdlib
     heapInstCore
-    semihosting
     pico_platform_hooks
+    semihosting
 )
 
 if (PICO_CYW43_SUPPORTED)

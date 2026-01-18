@@ -4,11 +4,9 @@ set(TARGET_NAME hello_world)
 
 add_executable(${TARGET_NAME} main.c)
 
-# Link libraries using the new library target name
 target_link_libraries(${TARGET_NAME}
     pico_stdlib
     semihosting
-    pico_platform_hooks
 )
 
 if (PICO_CYW43_SUPPORTED)

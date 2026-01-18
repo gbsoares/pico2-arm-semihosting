@@ -73,14 +73,30 @@ target_include_directories(heapInstCore
 )
 set_property(TARGET heapInstCore PROPERTY C_STANDARD 11)
 
-set(_heaptrc_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
+# -----------------------------------------------------------------------------
+# Streamport libraries (built separately, linked by examples/applications)
+# -----------------------------------------------------------------------------
+# Each stream transport provides heapInstStreamPort_* symbols. Applications link
+# both heapInstCore and their chosen stream transport - the linker resolves the
+# stream transport calls from whichever library is linked.
+#
+# heapInstCore needs the stream transport header (heapInstStream.h) at compile time,
+# but the actual implementation is provided by whichever stream transport library
+# the application links.
+set(_stream_dir "${CMAKE_CURRENT_SOURCE_DIR}/stream/${CFG_STREAM_METHOD}")
 if(NOT HEAPINST_TESTS_ONLY)
-    if(EXISTS "${_heaptrc_stream_dir}/CMakeLists.txt")
-        add_subdirectory("${_heaptrc_stream_dir}" "stream/${CFG_STREAM_METHOD}")
-        # Link heapInstCore to the selected streamport
-        target_link_libraries(heapInstCore PRIVATE semihosting)
+    if(EXISTS "${_stream_dir}/CMakeLists.txt")
+        add_subdirectory("${_stream_dir}" "stream/${CFG_STREAM_METHOD}")
+        # Provide stream transport header to heapInstCore for compilation.
+        # Note: We only add the INCLUDE path, not link the library.
+        # The linker will resolve heapInstStreamPort_* from whatever
+        # stream transport the final executable links.
+        target_include_directories(heapInstCore
+            PRIVATE
+                ${_stream_dir}/include
+        )
     else()
-        message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_heaptrc_stream_dir}")
+        message(FATAL_ERROR "CFG_STREAM_METHOD='${CFG_STREAM_METHOD}' has no CMakeLists.txt under ${_stream_dir}")
     endif()
 else()
     message(STATUS "HEAPINST_TESTS_ONLY=ON: skipping transport library configuration")
