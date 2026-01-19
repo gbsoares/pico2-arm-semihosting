@@ -34,6 +34,12 @@ option(
     ${PROJECT_IS_TOP_LEVEL}
 )
 
+option(
+    HEAPINST_DEBUG_LOG
+    "Enable debug logging in heap instrumentation library. Default: ON."
+    ON
+)
+
 
 # Include platform-specific initialization (SDK init and dependency injection)
 if(CFG_PLATFORM STREQUAL "PICO")
@@ -69,6 +75,13 @@ target_link_libraries(heapInstCore
         heapInstStream
 )
 set_property(TARGET heapInstCore PROPERTY C_STANDARD 11)
+
+# Configure debug logging
+if(HEAPINST_DEBUG_LOG)
+    target_compile_definitions(heapInstCore PRIVATE HEAPINST_CFG_DEBUG_LOG=1)
+else()
+    target_compile_definitions(heapInstCore PRIVATE HEAPINST_CFG_DEBUG_LOG=0)
+endif()
 
 # -----------------------------------------------------------------------------
 # Automatic malloc/free wrapping (works on any platform with GNU linker)

@@ -9,11 +9,11 @@
             "options": [
                 {
                     "label": "hello_world",
-                    "value": "semihosting/hello_world/hello_world"
+                    "value": "hello_world/hello_world"
                 },
                 {
                     "label": "heap_trace",
-                    "value": "semihosting/heap_trace/heap_trace"
+                    "value": "heap_trace/heap_trace"
                 }
             ]
         }
@@ -22,7 +22,7 @@
         {
             "name": "Pico Debug (Cortex-Debug)",
             "cwd": "${env:PICO_SDK_TOOLS_PATH}/openocd/scripts",
-            "executable": "${workspaceFolder}/build/examples/${input:target}.elf",
+            "executable": "${workspaceFolder}/build/examples/pico/${input:target}.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
@@ -39,7 +39,7 @@
             // Also works fine for flash binaries
             "overrideLaunchCommands": [
                 "monitor reset init",
-                "load \"${workspaceFolder}/build/examples/${input:target}.elf\""
+                "load \"${workspaceFolder}/build/examples/pico/${input:target}.elf\""
             ],
             "openOCDLaunchCommands": [
                 "adapter speed 5000"
@@ -56,7 +56,7 @@
         {
             "name": "Pico Attach (Cortex-Debug)",
             "cwd": "${env:PICO_SDK_TOOLS_PATH}/openocd/scripts",
-            "executable": "${workspaceFolder}/build/examples/${input:target}.elf",
+            "executable": "${workspaceFolder}/build/examples/pico/${input:target}.elf",
             "request": "attach",
             "type": "cortex-debug",
             "servertype": "openocd",

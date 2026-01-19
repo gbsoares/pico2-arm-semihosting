@@ -88,7 +88,7 @@ class HeapInstTest : public ::testing::Test
 
 TEST_F(HeapInstTest, InitAddsSingleRecord)
 {
-    heap_inst_init();
+    heap_inst_init(nullptr);
     EXPECT_TRUE(heap_inst_is_initialized());
     EXPECT_EQ(heap_inst_get_buffer_count(), 1u);
 
@@ -102,7 +102,7 @@ TEST_F(HeapInstTest, InitAddsSingleRecord)
 
 TEST_F(HeapInstTest, RecordsMallocAndFree)
 {
-    heap_inst_init();
+    heap_inst_init(nullptr);
     void* ptr = malloc(16);
     ASSERT_NE(ptr, nullptr);
     free(ptr);
@@ -122,7 +122,7 @@ TEST_F(HeapInstTest, RecordsMallocAndFree)
 
 TEST_F(HeapInstTest, FlushesWhenBufferFull)
 {
-    heap_inst_init();
+    heap_inst_init(nullptr);
     size_t capacity = heap_inst_get_buffer_capacity();
 
     // Fill the buffer to trigger auto-flush
@@ -144,7 +144,7 @@ TEST_F(HeapInstTest, FallsBackToTextWhenStreamportFails)
     // Set streamport to fail mode BEFORE init
     test_set_stream_fail_mode(0);  // Fail immediately on any write
 
-    heap_inst_init();
+    heap_inst_init(nullptr);
     void* ptr = malloc(8);
     (void)ptr;
     heap_inst_flush();
@@ -164,7 +164,7 @@ TEST_F(HeapInstTest, FallsBackToTextWhenStreamportFails)
 
 TEST_F(HeapInstTest, RecordsRealloc)
 {
-    heap_inst_init();
+    heap_inst_init(nullptr);
     void* ptr = malloc(16);
     ASSERT_NE(ptr, nullptr);
     void* new_ptr = realloc(ptr, 32);
@@ -187,7 +187,7 @@ TEST_F(HeapInstTest, RecordsRealloc)
 
 TEST_F(HeapInstTest, TimestampsIncrement)
 {
-    heap_inst_init();
+    heap_inst_init(nullptr);
     void* ptr = malloc(8);
     void* ptr2 = malloc(16);
     (void)ptr;

@@ -46,7 +46,28 @@ typedef enum {
 /**
  * @brief Encoded heap operation record written to the trace stream.
  *
- * Fields arg1..arg3 are interpreted based on @ref heap_operation_t.
+ * Fixed 24-byte record format. Fields arg1..arg3 are interpreted based on
+ * the operation type:
+ *
+ * HEAP_OP_INIT:
+ *   - arg1: heap_base   - Start address of the heap region
+ *   - arg2: heap_size   - Total size of the heap region in bytes
+ *   - arg3: flags       - Bit flags (see HEAP_INIT_FLAG_*)
+ *
+ * HEAP_OP_MALLOC:
+ *   - arg1: size        - Requested allocation size in bytes
+ *   - arg2: ptr         - Returned pointer (or 0 if allocation failed)
+ *   - arg3: (unused)
+ *
+ * HEAP_OP_FREE:
+ *   - arg1: ptr         - Pointer being freed
+ *   - arg2: (unused)
+ *   - arg3: (unused)
+ *
+ * HEAP_OP_REALLOC:
+ *   - arg1: old_ptr     - Original pointer (or 0 for malloc-like behavior)
+ *   - arg2: new_size    - Requested new size
+ *   - arg3: new_ptr     - Returned pointer (or 0 if reallocation failed)
  */
 typedef struct heap_inst_record {
     uint8_t operation;     /* heap_inst_operation_t */
@@ -57,6 +78,11 @@ typedef struct heap_inst_record {
     uint32_t arg2;         /* op-specific argument */
     uint32_t arg3;         /* op-specific argument */
 } heap_inst_record_t;
+
+/**
+ * @brief Flags for HEAP_OP_INIT record arg3 field.
+ */
+#define HEAP_INIT_FLAG_HEAP_INFO_VALID  (1 << 0)  /* heap_base and heap_size are valid */
 
 /**
  * @brief Platform hooks injected by the port layer.
@@ -77,11 +103,38 @@ typedef struct heap_inst_platform_hooks {
     void* unlock_ctx;
 } heap_inst_platform_hooks_t;
 
+/**
+ * @brief Heap region configuration for initialization.
+ *
+ * Provides information about the heap memory region to enable accurate
+ * visualization in analysis tools. On Pico platforms, this is typically
+ * auto-detected from linker symbols (__end__ to __StackLimit).
+ */
+typedef struct heap_inst_heap_info {
+    void* heap_start;   /* Start address of heap region (NULL if unknown) */
+    size_t heap_size;   /* Total size of heap region in bytes (0 if unknown) */
+} heap_inst_heap_info_t;
+
 /* Platform hooks registration */
 void heap_inst_register_platform_hooks(const heap_inst_platform_hooks_t* hooks);
 
 /* Instrumentation lifecycle */
-void heap_inst_init(void);
+
+/**
+ * @brief Initialize heap instrumentation.
+ *
+ * @param heap_info  Optional heap region configuration. Pass NULL to attempt
+ *                   auto-detection from linker symbols (works on Pico platforms).
+ *
+ * On Pico platforms with NULL heap_info, heap bounds are auto-detected from
+ * linker symbols __end__ (heap start) and __StackLimit (heap end).
+ *
+ * On host platforms or when auto-detection fails, the INIT record will have
+ * heap_base=0, heap_size=0, and HEAP_INIT_FLAG_HEAP_INFO_VALID will not be set.
+ * The visualization tool will then infer bounds from observed allocations.
+ */
+void heap_inst_init(const heap_inst_heap_info_t* heap_info);
+
 void heap_inst_flush(void);
 bool heap_inst_is_initialized(void);
 

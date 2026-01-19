@@ -126,7 +126,7 @@ int main(void)
      * With HEAPINST_AUTO_WRAP enabled (the default), all standard malloc/free/
      * realloc calls are automatically traced via linker --wrap flags.
      */
-    heap_inst_init();
+    heap_inst_init(NULL);  /* NULL = auto-detect heap bounds from linker symbols */
     printf("Heap instrumentation initialized\n");
     printf("Buffer capacity: %u records\n",
                     (unsigned)heap_inst_get_buffer_capacity());
