@@ -60,6 +60,19 @@
                 "CFG_BUILD_EXAMPLES": "OFF",
                 "CFG_BUILD_TESTS": "ON"
             }
+        },
+        {
+            "name": "host",
+            "displayName": "Host Examples",
+            "description": "Build examples for host system (filesystem transport)",
+            "binaryDir": "${sourceDir}/build/host",
+            "inherits": [
+                "_root-config"
+            ],
+            "cacheVariables": {
+                "CFG_BUILD_EXAMPLES": "ON",
+                "CFG_BUILD_TESTS": "OFF"
+            }
         }
     ],
     "buildPresets": [
@@ -85,6 +98,14 @@
             "configurePreset": "heap_tests",
             "targets": [
                 "heap_inst_tests"
+            ]
+        },
+        {
+            "name": "host",
+            "displayName": "Build Examples for Host",
+            "configurePreset": "host",
+            "targets": [
+                "all"
             ]
         }
     ],

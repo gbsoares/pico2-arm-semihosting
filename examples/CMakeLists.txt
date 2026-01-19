@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-# Examples are currently Pico-specific
+# Pico-specific examples (semihosting transport)
 if(CFG_PLATFORM STREQUAL "PICO")
-    add_subdirectory(semihosting)
-else()
-    message(STATUS "Skipping examples - only available for Pico platform")
+    add_subdirectory(pico)
+endif()
+
+# Host-specific examples (filesystem transport)
+if(NOT CMAKE_CROSSCOMPILING)
+    add_subdirectory(host)
 endif()

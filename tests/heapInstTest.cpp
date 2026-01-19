@@ -127,7 +127,8 @@ TEST_F(HeapInstTest, FlushesWhenBufferFull)
 
     // Fill the buffer to trigger auto-flush
     for (size_t i = 0; i < capacity; ++i) {
-        malloc(4);
+        void* ptr = malloc(4);
+        (void)ptr;
     }
 
     heap_inst_flush();
@@ -144,7 +145,8 @@ TEST_F(HeapInstTest, FallsBackToTextWhenStreamportFails)
     test_set_stream_fail_mode(0);  // Fail immediately on any write
 
     heap_inst_init();
-    malloc(8);
+    void* ptr = malloc(8);
+    (void)ptr;
     heap_inst_flush();
 
     // Stream buffer should be empty (all writes failed)
@@ -186,8 +188,10 @@ TEST_F(HeapInstTest, RecordsRealloc)
 TEST_F(HeapInstTest, TimestampsIncrement)
 {
     heap_inst_init();
-    malloc(8);
-    malloc(16);
+    void* ptr = malloc(8);
+    void* ptr2 = malloc(16);
+    (void)ptr;
+    (void)ptr2;
     heap_inst_flush();
 
     auto records = GetStreamRecords();

@@ -103,9 +103,15 @@ endif()
 # -----------------------------------------------------------------------------
 # Each stream transport provides heapInstStreamPort_* symbols. Applications link
 # both heapInstCore and their chosen stream transport library.
-# Transport libraries are platform-specific (require SDK), so only build on Pico.
+
+# Semihosting transport (Pico only - requires SDK and debugger)
 if(CFG_PLATFORM STREQUAL "PICO")
     add_subdirectory(stream/semihosting)
+endif()
+
+# Filesystem transport (host only - uses standard C file I/O)
+if(NOT CMAKE_CROSSCOMPILING)
+    add_subdirectory(stream/filesystem)
 endif()
 
 # -----------------------------------------------------------------------------
