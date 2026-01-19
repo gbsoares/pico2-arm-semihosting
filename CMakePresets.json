@@ -65,7 +65,6 @@
             "name": "host",
             "displayName": "Host Examples",
             "description": "Build examples for host system (filesystem transport)",
-            "binaryDir": "${sourceDir}/build/host",
             "inherits": [
                 "_root-config"
             ],

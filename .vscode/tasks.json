@@ -2,123 +2,47 @@
     "version": "2.0.0",
     "inputs": [
         {
-            "id": "picoPlatform",
-            "description": "Select the PICO_PLATFORM",
-            "default": "rp2350",
+            "id": "preset",
+            "description": "Select build preset",
+            "default": "pico2",
             "type": "pickString",
             "options": [
                 {
-                    "label": "RP2350 (Pico 2)",
+                    "label": "Pico 2 (RP2350)",
                     "value": "pico2"
                 },
                 {
-                    "label": "RP2040 (Pico 1)",
+                    "label": "Pico (RP2040)",
                     "value": "pico"
-                }
-            ]
-        },
-        {
-            "id": "buildTarget",
-            "description": "Select the build target",
-            "default": "all",
-            "type": "pickString",
-            "options": [
-                {
-                    "label": "All Targets",
-                    "value": "all"
                 },
                 {
-                    "label": "Hello World",
-                    "value": "hello_world"
+                    "label": "Host Examples",
+                    "value": "host"
                 },
                 {
-                    "label": "Heap Trace",
-                    "value": "heap_trace"
-                },
-                {
-                    "label": "Semihosting Library",
-                    "value": "semihosting"
+                    "label": "Tests",
+                    "value": "heap_tests"
                 }
             ]
         }
     ],
     "tasks": [
+        // =======================================================================
+        // Pico 2 (RP2350)
+        // =======================================================================
         {
-            "label": "CMake Configure",
+            "label": "Pico 2: Configure",
             "type": "shell",
             "command": "cmake",
-            "args": [
-                "--preset",
-                "${input:picoPlatform}",
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "CMake Build Target",
-            "type": "shell",
-            "command": "cmake",
-            "args": [
-                "--build",
-                "build",
-                "--target",
-                "${input:buildTarget}"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "Full Build (Configure + Build Target)",
-            "dependsOn": [
-                "CMake Configure",
-                "CMake Build Target"
-            ],
-            "dependsOrder": "sequence",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "CMake Clean",
-            "type": "shell",
-            "command": "cmake",
-            "args": [
-                "--build",
-                "build",
-                "--target",
-                "clean"
-            ],
+            "args": ["--preset", "pico2"],
             "group": "build",
-            "problemMatcher": []
+            "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Clean All (Remove Build Directory)",
+            "label": "Pico 2: Build",
             "type": "shell",
-            "command": "rm",
-            "args": [
-                "-rf",
-                "build"
-            ],
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Build All Targets",
-            "type": "shell",
-            "dependsOn": "CMake Configure",
             "command": "cmake",
-            "args": [
-                "--preset",
-                "${input:picoPlatform}",
-            ],
+            "args": ["--build", "--preset", "pico2"],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -126,13 +50,81 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Tests: Configure (host)",
+            "label": "Pico 2: Configure + Build",
+            "dependsOn": ["Pico 2: Configure", "Pico 2: Build"],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "problemMatcher": []
+        },
+        // =======================================================================
+        // Pico (RP2040)
+        // =======================================================================
+        {
+            "label": "Pico: Configure",
             "type": "shell",
             "command": "cmake",
-            "args": [
-                "--preset",
-                "heap_tests"
-            ],
+            "args": ["--preset", "pico"],
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Pico: Build",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "--preset", "pico"],
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Pico: Configure + Build",
+            "dependsOn": ["Pico: Configure", "Pico: Build"],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "problemMatcher": []
+        },
+        // =======================================================================
+        // Host Examples
+        // =======================================================================
+        {
+            "label": "Host: Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--preset", "host"],
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Host: Build",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "--preset", "host"],
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Host: Configure + Build",
+            "dependsOn": ["Host: Configure", "Host: Build"],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Host: Run heap_trace_host",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/examples/host/heap_trace/heap_trace_host",
+            "args": ["--trace-dir", "${workspaceFolder}/build/examples/host/heap_trace"],
+            "dependsOn": "Host: Build",
+            "group": "test",
+            "problemMatcher": []
+        },
+        // =======================================================================
+        // Tests
+        // =======================================================================
+        {
+            "label": "Tests: Configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--preset", "heap_tests"],
             "group": "test",
             "problemMatcher": ["$gcc"]
         },
@@ -140,12 +132,7 @@
             "label": "Tests: Build",
             "type": "shell",
             "command": "cmake",
-            "dependsOn": "Tests: Configure (host)",
-            "args": [
-                "--build",
-                "--preset",
-                "heap_tests"
-            ],
+            "args": ["--build", "--preset", "heap_tests"],
             "group": "test",
             "problemMatcher": ["$gcc"]
         },
@@ -153,12 +140,48 @@
             "label": "Tests: Run",
             "type": "shell",
             "command": "ctest",
-            "dependsOn": "Tests: Build",
-            "args": [
-                "--preset",
-                "heap_tests"
-            ],
+            "args": ["--preset", "heap_tests", "--output-on-failure"],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tests: Configure + Build + Run",
+            "dependsOn": ["Tests: Configure", "Tests: Build", "Tests: Run"],
+            "dependsOrder": "sequence",
             "group": "test",
+            "problemMatcher": []
+        },
+        // =======================================================================
+        // Generic (uses input picker)
+        // =======================================================================
+        {
+            "label": "Configure (select preset)",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--preset", "${input:preset}"],
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build (select preset)",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "--preset", "${input:preset}"],
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        // =======================================================================
+        // Clean
+        // =======================================================================
+        {
+            "label": "Clean: Remove all build directories",
+            "type": "shell",
+            "command": "rm",
+            "args": ["-rf", "build"],
+            "group": "build",
             "problemMatcher": []
         }
     ]
